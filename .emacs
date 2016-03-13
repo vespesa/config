@@ -26,8 +26,6 @@
 
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
-(global-set-key (kbd "C-M-s") 'isearch-forward)
-(global-set-key (kbd "C-M-r") 'isearch-backward)
 (global-set-key (kbd "C-x !") 'eshell)
 (global-set-key (kbd "C-x \"") 'shell)
 
@@ -55,7 +53,7 @@
 
 (show-paren-mode 1)
 (setq-default indent-tabs-mode nil)
-(setq tab-always-indent 'complete)
+;;(setq tab-always-indent 'complete)
 (setq x-select-enable-clipboard t
       x-select-enable-primary t
       save-interprogram-paste-before-kill t
@@ -119,6 +117,7 @@
 (require 'helm-config)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
+(global-set-key (kbd "C-c C-s") 'helm-do-ag-this-file)
 
 
 ;; Ido ubiquitous
@@ -250,6 +249,7 @@
 ;; Git-flow
 (require 'magit-gitflow)
 (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
+
 
 ;; For some reason Magit does not revert buffers
 ;; automatically even when the MRev is on.
@@ -440,14 +440,28 @@
 (global-set-key (kbd "s-j") 'ace-window)
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
 
+(defun local-set-minor-mode-key (mode key def)
+  "Overrides a minor mode keybinding for the local buffer, by
+   creating or altering keymaps stored in buffer-local
+   `minor-mode-overriding-map-alist'.
+   Source: http://stackoverflow.com/a/14769115"
+  (let* ((oldmap (cdr (assoc mode minor-mode-map-alist)))
+         (newmap (or (cdr (assoc mode minor-mode-overriding-map-alist))
+                     (let ((map (make-sparse-keymap)))
+                       (set-keymap-parent map oldmap)
+                       (push `(,mode . ,map) minor-mode-overriding-map-alist)
+                       map))))
+    (define-key newmap key def)))
 
 ;; JavaScript
-(require 'js3-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
+(require 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
-(add-hook 'js3-mode-hook (lambda ()
+(add-hook 'js2-mode-hook (lambda ()
                            (tern-mode t)
-                           (ggtags-mode 1)))
+                           (ggtags-mode 1)
+                           (local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
+                           (local-set-minor-mode-key 'smartparens-mode-map (kbd "C-<right>") 'sp-slurp-hybrid-sexp)))
 (add-to-list 'company-backends 'company-tern)
 
 
@@ -478,7 +492,7 @@
  '(comint-prompt-read-only t)
  '(company-dabbrev-code-modes
    (quote
-    (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode scss-mode html-mode)))
+    (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode js2-mode scss-mode html-mode)))
  '(company-idle-delay 0.2)
  '(compilation-message-face (quote default))
  '(css-indent-offset 2)
@@ -544,6 +558,21 @@
  '(js3-strict-trailing-comma-warning nil)
  '(js3-strict-var-hides-function-arg-warning nil)
  '(js3-strict-var-redeclaration-warning nil)
+ '(js2-consistent-level-indent-inner-bracket t)
+ '(js2-highlight-external-variables nil)
+ '(js2-include-browser-externs nil)
+ '(js2-include-gears-externs nil)
+ '(js2-include-rhino-externs nil)
+ '(js2-mode-show-parse-errors t)
+ '(js2-mode-show-strict-warnings nil)
+ '(js2-pretty-vars nil)
+ '(js2-strict-cond-assign-warning nil)
+ '(js2-strict-inconsistent-return-warning nil)
+ '(js2-strict-missing-semi-warning t)
+ '(js2-strict-trailing-comma-warning nil)
+ '(js2-strict-var-hides-function-arg-warning nil)
+ '(js2-strict-var-redeclaration-warning nil)
+ '(magit-gitflow-hotfix-finish-arguments nil)
  '(magit-no-confirm (quote (stage-all-changes)))
  '(magit-use-overlays nil)
  '(org-agenda-files (quote ("~/org/" "~/Documents/journal/")))
@@ -591,6 +620,7 @@
     ((inferior-python-mode regexp "")
      (python-mode regexp "")
      (js3-mode regexp "")
+     (js2-mode regexp "")
      (ruby-mode syntax "")
      (robot-mode regexp "")
      (scss-mode regexp ""))))
@@ -613,6 +643,7 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "DejaVu Sans Mono"))))
  '(company-tooltip ((t (:background "wheat2"))))
+ '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
  '(fringe ((t (:background "#fdf6e3"))))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
