@@ -111,14 +111,11 @@
   (exec-path-from-shell-initialize))
 (add-hook 'after-init-hook 'exec-path-from-shell-initialize)
 
-
-
 ;; Helm
 (require 'helm-config)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
 (global-set-key (kbd "C-c C-s") 'helm-do-ag-this-file)
-
 
 ;; Ido ubiquitous
 (require 'ido-ubiquitous)
@@ -134,6 +131,8 @@
 ;; Company mode
 (add-hook 'after-init-hook 'global-company-mode)
 (company-quickhelp-mode 1)
+(setq company-global-modes '(not eshell-mode))
+
 
 ;; Smartparens
 (require 'smartparens-config)
@@ -297,6 +296,7 @@
 (global-set-key (kbd "s-.") 'projectile-find-tag)
 (global-set-key (kbd "H-p") 'helm-projectile-find-file)
 (global-set-key (kbd "H-1") 'projectile-run-eshell)
+(global-set-key (kbd "H-2") 'projectile-run-shell)
 
 (require 'project-explorer)
 (global-set-key (kbd "M-§")
@@ -322,7 +322,7 @@
 
 ;; Remove trailing whitespace unobtrusively
 (require 'ws-butler)
-(add-hook 'prog-mode-hook 'ws-butler-global-mode)
+(add-hook 'prog-mode-hook 'ws-butler-mode)
 
 ;; Better parens support
 (require 'mic-paren)
@@ -359,6 +359,20 @@
 ;; Solarized theme
 ;; (add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized")
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized")
+
+;; Shell-mode tweaks
+;; https://github.com/Hawstein/my-emacs/blob/master/_emacs/shell-buffer.el
+
+(add-hook 'shell-mode-hook 'wcy-shell-mode-hook-func)
+(defun wcy-shell-mode-hook-func  ()
+  (set-process-sentinel (get-buffer-process (current-buffer))
+                        #'wcy-shell-mode-kill-buffer-on-exit))
+(defun wcy-shell-mode-kill-buffer-on-exit (process state)
+  (message "%s" state)
+  (if (or
+       (string-match "exited abnormally with code.*" state)
+       (string-match "finished" state))
+      (kill-buffer (current-buffer))))
 
 ;;; Treat all themes as safe
 (setq custom-safe-themes t)
@@ -462,11 +476,19 @@
 
 (add-hook 'js2-mode-hook (lambda ()
                            (tern-mode t)
-                           (ggtags-mode 1)
+                           ;;(ggtags-mode 1)
                            (local-unset-key (kbd "C-c C-s"))
-                           (local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
+                           (local-unset-key (kbd "M-."))
+                           (define-key tern-mode-keymap (kbd "M-.") 'helm-etags-select)
+                           (define-key tern-mode-keymap (kbd "M-,") 'pop-tag-mark)
+                           ;;(local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
                            (local-set-minor-mode-key 'smartparens-mode-map (kbd "C-<right>") 'sp-slurp-hybrid-sexp)))
 (add-to-list 'company-backends 'company-tern)
+
+;; TAGS
+;; I never got the global/projectile work properly so let's just use ctags.
+(global-set-key (kbd "M-.") 'helm-etags-select)
+(global-set-key (kbd "M-,") 'pop-tag-mark)
 
 
 ;; Robot mode
@@ -479,7 +501,7 @@
 (global-set-key (kbd "C-.") #'helm-imenu-anywhere)
 
 ;; dumb-jump
-(dumb-jump-mode)
+;;(dumb-jump-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -494,12 +516,20 @@
  '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)))
  '(calendar-week-start-day 1)
  '(cider-pprint-fn (quote fipp))
+ '(cider-prompt-for-symbol nil)
+ '(cider-repl-display-in-current-window t)
  '(coffee-tab-width 2)
  '(comint-prompt-read-only t)
+ '(company-backends
+   (quote
+    (company-bbdb company-nxml company-css company-eclim company-semantic company-clang company-xcode company-cmake company-capf company-files
+                  (company-dabbrev-code company-gtags company-etags company-keywords)
+                  company-oddmuse company-dabbrev)))
  '(company-dabbrev-code-modes
    (quote
     (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode js2-mode scss-mode html-mode)))
  '(company-idle-delay 0.2)
+ '(company-selection-wrap-around t)
  '(compilation-message-face (quote default))
  '(css-indent-offset 2)
  '(cua-global-mark-cursor-color "#2aa198")
@@ -523,7 +553,9 @@
  '(grep-find-ignored-directories
    (quote
     ("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "public")))
+ '(helm-buffer-max-length nil)
  '(helm-lisp-fuzzy-completion t)
+ '(helm-mode t)
  '(helm-split-window-default-side (quote right))
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
@@ -608,7 +640,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
- '(projectile-enable-idle-timer nil)
+ '(projectile-enable-idle-timer t)
  '(projectile-use-git-grep t)
  '(scss-compile-at-save nil)
  '(show-paren-mode nil)
@@ -635,6 +667,8 @@
  '(speedbar-show-unknown-files t)
  '(speedbar-use-images nil)
  '(sr-speedbar-right-side nil)
+ '(tags-add-tables nil)
+ '(tags-revert-without-query t)
  '(term-default-bg-color "#fdf6e3")
  '(term-default-fg-color "#657b83")
  '(tool-bar-mode nil)
@@ -652,6 +686,7 @@
  '(company-tooltip ((t (:background "wheat2"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
  '(fringe ((t (:background "#fdf6e3"))))
+ '(helm-selection ((t (:background "sienna1" :foreground "White"))))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
  '(web-mode-current-column-highlight-face ((t (:background "bisque")))))
