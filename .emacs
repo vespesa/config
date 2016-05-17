@@ -29,12 +29,19 @@
 (global-set-key (kbd "C-x !") 'eshell)
 (global-set-key (kbd "C-x \"") 'shell)
 
-(global-set-key (kbd "s-1") (lambda () (interactive)
+(global-set-key (kbd "C-<kp-7>") (lambda () (interactive)
                               (display-buffer "*eshell*" nil nil)
                               (switch-to-buffer-other-window "*eshell*" )))
 (global-set-key (kbd "s-1") (lambda () (interactive)
                               (display-buffer "*eshell*" nil nil)
                               (switch-to-buffer-other-window "*eshell*" )))
+
+(defun eshell/clear ()
+  "Clear the eshell buffer."
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+
 
 (defun comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region.
@@ -131,7 +138,7 @@
 ;; Company mode
 (add-hook 'after-init-hook 'global-company-mode)
 (company-quickhelp-mode 1)
-(setq company-global-modes '(not eshell-mode))
+;;(setq company-global-modes '(not eshell-mode))
 
 
 ;; Smartparens
@@ -297,6 +304,10 @@
 (global-set-key (kbd "H-p") 'helm-projectile-find-file)
 (global-set-key (kbd "H-1") 'projectile-run-eshell)
 (global-set-key (kbd "H-2") 'projectile-run-shell)
+(global-set-key (kbd "<f13>") 'helm-projectile-find-file)
+(global-set-key (kbd "C-<kp-9>") 'helm-projectile-find-file)
+(global-set-key (kbd "C-<kp-7>") 'projectile-run-eshell)
+(global-set-key (kbd "C-<kp-8>") 'projectile-run-shell)
 
 (require 'project-explorer)
 (global-set-key (kbd "M-§")
@@ -528,6 +539,7 @@
  '(company-dabbrev-code-modes
    (quote
     (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode js2-mode scss-mode html-mode)))
+ '(company-global-modes (quote (not)))
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
  '(compilation-message-face (quote default))
@@ -690,3 +702,4 @@
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
  '(web-mode-current-column-highlight-face ((t (:background "bisque")))))
+(put 'erase-buffer 'disabled nil)
