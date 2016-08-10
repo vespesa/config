@@ -138,7 +138,7 @@
 ;; Company mode
 (add-hook 'after-init-hook 'global-company-mode)
 (company-quickhelp-mode 1)
-;;(setq company-global-modes '(not eshell-mode))
+(setq company-global-modes '(not eshell-mode))
 
 
 ;; Smartparens
@@ -230,7 +230,7 @@
 
 ;;(add-hook 'cider-repl-mode-hook 'paredit-mode)
 (setq cider-repl-use-pretty-printing t)
-
+(helm-cider-mode 1)
 (setq cider-show-error-buffer nil)
 (setq nrepl-log-messages nil)
 
@@ -384,6 +384,14 @@
        (string-match "exited abnormally with code.*" state)
        (string-match "finished" state))
       (kill-buffer (current-buffer))))
+
+(defun clear-comint-buffer ()
+  (interactive)
+  (let ((old-max comint-buffer-maximum-size))
+    (setq comint-buffer-maximum-size 0)
+    (comint-truncate-buffer)
+    (setq comint-buffer-maximum-size old-max)
+    (goto-char (point-max))))
 
 ;;; Treat all themes as safe
 (setq custom-safe-themes t)
@@ -539,7 +547,6 @@
  '(company-dabbrev-code-modes
    (quote
     (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode js2-mode scss-mode html-mode)))
- '(company-global-modes (quote (not)))
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
  '(compilation-message-face (quote default))
@@ -599,7 +606,7 @@
  '(js2-include-browser-externs nil)
  '(js2-include-gears-externs nil)
  '(js2-include-rhino-externs nil)
- '(js2-mode-show-parse-errors t)
+ '(js2-mode-show-parse-errors nil)
  '(js2-mode-show-strict-warnings nil)
  '(js2-pretty-vars nil)
  '(js2-strict-cond-assign-warning nil)
