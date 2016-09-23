@@ -36,11 +36,17 @@
                               (display-buffer "*eshell*" nil nil)
                               (switch-to-buffer-other-window "*eshell*" )))
 
-(defun eshell/clear ()
+(defun eshell/old-clear ()
   "Clear the eshell buffer."
   (let ((inhibit-read-only t))
     (erase-buffer)
     (eshell-send-input)))
+
+
+(add-hook 'eshell-mode-hook (lambda ()
+                              (local-set-key (kbd "C-l") (lambda ()
+                                                           (interactive)
+                                                           (eshell/clear-scrollback)))))
 
 
 (defun comment-or-uncomment-region-or-line ()
@@ -111,6 +117,10 @@
 ;; Tweaking of installed packages
 (package-initialize)
 
+
+;; Auto-indent
+(require 'auto-indent-mode)
+(auto-indent-global-mode)
 
 ;; Make sure that the Emacs exec path is the same as Bash.
 (when (memq window-system '(mac ns))
@@ -216,8 +226,7 @@
   ;; (cljr-add-keybindings-with-prefix "C-c C-m")
   ;; (require 'cljr-helm)
   ;; (define-key clojure-mode-map (kbd "C-c r") 'cljr-helm)
-  (require 'align-cljlet)
-  (define-key clojure-mode-map (kbd "C-c C-a") 'align-cljlet)
+  (define-key clojure-mode-map (kbd "C-c C-a") 'clojure-align)
   (define-key clojure-mode-map (kbd "C-c h") 'clojure-cheatsheet))
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
@@ -301,6 +310,7 @@
                 (lambda () (interactive)
                   (helm-projectile-ag)))
 (global-set-key (kbd "s-.") 'projectile-find-tag)
+(global-set-key (kbd "s-,") 'pop-tag-mark)
 (global-set-key (kbd "H-p") 'helm-projectile-find-file)
 (global-set-key (kbd "H-1") 'projectile-run-eshell)
 (global-set-key (kbd "H-2") 'projectile-run-shell)
@@ -425,9 +435,10 @@
                                                                     (interactive)
                                                                     (org-mode-restart)))))
 (global-set-key (kbd "C-c f") 'org-journal-search-forever)
+(global-set-key (kbd "C-c j") 'org-journal-new-entry)
 
 ;; SCSS (Sass)
-(require 'scss-mode)
+;;(require 'scss-mode)
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 ;;(add-hook 'sccs-mode-hook 'electric-pair-mode)
 
@@ -498,16 +509,20 @@
                            ;;(ggtags-mode 1)
                            (local-unset-key (kbd "C-c C-s"))
                            (local-unset-key (kbd "M-."))
-                           (define-key tern-mode-keymap (kbd "M-.") 'helm-etags-select)
-                           (define-key tern-mode-keymap (kbd "M-,") 'pop-tag-mark)
+                           ;; xref-js2
+                           (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)
+                           ;; Ctags
+                           ;;(define-key tern-mode-keymap (kbd "M-.") 'helm-etags-select)
+                           ;;(define-key tern-mode-keymap (kbd "M-,") 'pop-tag-mark)
+                           ;; Tern
                            ;;(local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
                            (local-set-minor-mode-key 'smartparens-mode-map (kbd "C-<right>") 'sp-slurp-hybrid-sexp)))
 (add-to-list 'company-backends 'company-tern)
 
 ;; TAGS
 ;; I never got the global/projectile work properly so let's just use ctags.
-(global-set-key (kbd "M-.") 'helm-etags-select)
-(global-set-key (kbd "M-,") 'pop-tag-mark)
+;; (global-set-key (kbd "M-.") 'helm-etags-select)
+;; (global-set-key (kbd "M-,") 'pop-tag-mark)
 
 
 ;; Robot mode
@@ -527,6 +542,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(auto-indent-indent-style (quote conservative))
+ '(auto-indent-kill-remove-extra-spaces t)
+ '(auto-indent-untabify-on-save-file nil)
  '(auto-revert-check-vc-info nil)
  '(auto-revert-interval 2)
  '(avy-all-windows nil)
@@ -562,7 +580,7 @@
     ("ff9e6deb9cfc908381c1267f407b8830bcad6028231a5f736246b9fc65e92b44" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" "d1dbd38c2fef808a27bb411ecff76a0a8026856a16cb2a1fb8820bedeb45740a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default)))
  '(custom-theme-load-path
    (quote
-    ("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/" "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2" custom-theme-directory t)))
+    ("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/" "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2" custom-theme-directory t)) t)
  '(exec-path
    (quote
     ("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin")))
@@ -600,7 +618,7 @@
    (quote
     ("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3")))
  '(inhibit-startup-screen t)
- '(js2-basic-offset 2)
+ '(js-indent-level 2)
  '(js2-consistent-level-indent-inner-bracket t)
  '(js2-highlight-external-variables nil)
  '(js2-include-browser-externs nil)
@@ -657,10 +675,14 @@
      ("Marmalade" . "https://marmalade-repo.org/packages/")
      ("Melpa" . "https://melpa.org/packages/")
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
+ '(package-selected-packages
+   (quote
+    (auto-indent-mode clojure-mode cider xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smartparens smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc org-journal multiple-cursors monky mic-paren markdown-mode magit-gitflow js3-mode js2-mode inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-cider helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(projectile-enable-idle-timer t)
  '(projectile-use-git-grep t)
+ '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(scss-compile-at-save nil)
  '(show-paren-mode nil)
  '(show-smartparens-global-mode t)
@@ -702,6 +724,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "DejaVu Sans Mono"))))
+ '(cider-error-highlight-face ((t (:inherit nil :background "light salmon"))))
  '(company-tooltip ((t (:background "wheat2"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
  '(fringe ((t (:background "#fdf6e3"))))
