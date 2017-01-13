@@ -46,6 +46,9 @@
 (add-hook 'eshell-mode-hook (lambda ()
                               (local-set-key (kbd "C-l") (lambda ()
                                                            (interactive)
+                                                           (eshell/clear-scrollback)))
+                              (local-set-key (kbd "C-c C-l") (lambda ()
+                                                           (interactive)
                                                            (eshell/clear-scrollback)))))
 
 
@@ -65,6 +68,8 @@
 (column-number-mode 1)
 
 (show-paren-mode 1)
+(electric-indent-mode 1)
+
 (setq-default indent-tabs-mode nil)
 ;;(setq tab-always-indent 'complete)
 (setq x-select-enable-clipboard t
@@ -117,11 +122,6 @@
 ;; Tweaking of installed packages
 (package-initialize)
 
-
-;; Auto-indent
-(require 'auto-indent-mode)
-(auto-indent-global-mode)
-
 ;; Make sure that the Emacs exec path is the same as Bash.
 (when (memq window-system '(mac ns))
   (require 'exec-path-from-shell)
@@ -129,10 +129,15 @@
 (add-hook 'after-init-hook 'exec-path-from-shell-initialize)
 
 ;; Helm
+(require 'helm)
 (require 'helm-config)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
-(global-set-key (kbd "C-c C-s") 'helm-do-ag-this-file)
+;(global-set-key (kbd "C-c C-s") 'helm-do-ag-this-file)
+(global-set-key (kbd "C-s") 'helm-swoop)
+
+(define-key helm-map (kbd "<tab>")    'helm-execute-persistent-action)
+(define-key helm-map (kbd "M-x") 'helm-select-action)
 
 ;; Ido ubiquitous
 (require 'ido-ubiquitous)
@@ -315,7 +320,7 @@
 (global-set-key (kbd "H-1") 'projectile-run-eshell)
 (global-set-key (kbd "H-2") 'projectile-run-shell)
 (global-set-key (kbd "<f13>") 'helm-projectile-find-file)
-(global-set-key (kbd "C-<kp-9>") 'helm-projectile-find-file)
+(global-set-key (kbd "<f16>") 'helm-projectile-find-file)
 (global-set-key (kbd "C-<kp-7>") 'projectile-run-eshell)
 (global-set-key (kbd "C-<kp-8>") 'projectile-run-shell)
 
@@ -506,14 +511,13 @@
 
 (add-hook 'js2-mode-hook (lambda ()
                            (tern-mode t)
-                           ;;(ggtags-mode 1)
+                           (define-key tern-mode-keymap (kbd "M-.") nil)
+                           (define-key tern-mode-keymap (kbd "M-,") nil)
                            (local-unset-key (kbd "C-c C-s"))
                            (local-unset-key (kbd "M-."))
                            ;; xref-js2
                            (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)
                            ;; Ctags
-                           ;;(define-key tern-mode-keymap (kbd "M-.") 'helm-etags-select)
-                           ;;(define-key tern-mode-keymap (kbd "M-,") 'pop-tag-mark)
                            ;; Tern
                            ;;(local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
                            (local-set-minor-mode-key 'smartparens-mode-map (kbd "C-<right>") 'sp-slurp-hybrid-sexp)))
@@ -537,14 +541,16 @@
 ;; dumb-jump
 ;;(dumb-jump-mode)
 
+;; Paradox package manager
+;; The contents of the paradox-token.el are simply
+;; (setq paradox-github-token "github personal tokem" )
+(load "paradox-token")
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(auto-indent-indent-style (quote conservative))
- '(auto-indent-kill-remove-extra-spaces t)
- '(auto-indent-untabify-on-save-file nil)
  '(auto-revert-check-vc-info nil)
  '(auto-revert-interval 2)
  '(avy-all-windows nil)
@@ -593,7 +599,7 @@
  '(helm-buffer-max-length nil)
  '(helm-lisp-fuzzy-completion t)
  '(helm-mode t)
- '(helm-split-window-default-side (quote right))
+ '(helm-split-window-default-side (quote same))
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
    (--map
@@ -619,11 +625,13 @@
     ("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3")))
  '(inhibit-startup-screen t)
  '(js-indent-level 2)
+ '(js2-bounce-indent-p nil)
  '(js2-consistent-level-indent-inner-bracket t)
  '(js2-highlight-external-variables nil)
  '(js2-include-browser-externs nil)
  '(js2-include-gears-externs nil)
  '(js2-include-rhino-externs nil)
+ '(js2-mode-assume-strict t)
  '(js2-mode-show-parse-errors nil)
  '(js2-mode-show-strict-warnings nil)
  '(js2-pretty-vars nil)
@@ -647,6 +655,7 @@
  '(js3-strict-trailing-comma-warning nil)
  '(js3-strict-var-hides-function-arg-warning nil)
  '(js3-strict-var-redeclaration-warning nil)
+ '(magit-display-buffer-function (quote magit-display-buffer-same-window-except-diff-v1))
  '(magit-gitflow-hotfix-finish-arguments nil)
  '(magit-no-confirm (quote (stage-all-changes)))
  '(magit-use-overlays nil)
@@ -677,7 +686,8 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (auto-indent-mode clojure-mode cider xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smartparens smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc org-journal multiple-cursors monky mic-paren markdown-mode magit-gitflow js3-mode js2-mode inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-cider helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (helm-swoop cider cider-eval-sexp-fu clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-cider helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+ '(paradox-automatically-star nil)
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(projectile-enable-idle-timer t)
@@ -724,7 +734,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "DejaVu Sans Mono"))))
- '(cider-error-highlight-face ((t (:inherit nil :background "light salmon"))))
+ '(cider-error-highlight-face ((t (:inherit nil :background "MistyRose1"))))
  '(company-tooltip ((t (:background "wheat2"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
  '(fringe ((t (:background "#fdf6e3"))))
@@ -733,3 +743,4 @@
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
  '(web-mode-current-column-highlight-face ((t (:background "bisque")))))
 (put 'erase-buffer 'disabled nil)
+(put 'upcase-region 'disabled nil)
