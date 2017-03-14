@@ -257,7 +257,8 @@
 (add-hook 'cider-repl-mode-hook
           (lambda ()
             (eldoc-mode t)
-            (define-key cider-repl-mode-map (kbd "s-'") 'cider-switch-to-last-clojure-buffer)))
+            (define-key cider-repl-mode-map (kbd "s-'") 'cider-switch-to-last-clojure-buffer)
+            (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)))
 
 ;; Magit (Git support)
 (require 'magit)
@@ -291,7 +292,7 @@
 
 ;; We'll start the server just in case to avoid
 ;; git complaining about EDITOR.
-(or 'server-process server-start) 
+(or 'server-process server-start)
 (setenv "EDITOR" "/Applications/Emacs.app/Contents/MacOS/bin/emacsclient")
 
 ;; Mercurial
@@ -304,7 +305,7 @@
           (lambda ()
             (local-set-key (kbd "C-c s g") 'smerge-keep-other)
             (local-set-key (kbd "C-c s r") 'smerge-keep-mine)))
-                              
+
 
 ;; Projectile
 (projectile-global-mode)
@@ -319,10 +320,12 @@
 (global-set-key (kbd "H-p") 'helm-projectile-find-file)
 (global-set-key (kbd "H-1") 'projectile-run-eshell)
 (global-set-key (kbd "H-2") 'projectile-run-shell)
+(global-set-key (kbd "H-3") 'projectile-run-term)
 (global-set-key (kbd "<f13>") 'helm-projectile-find-file)
 (global-set-key (kbd "<f16>") 'helm-projectile-find-file)
 (global-set-key (kbd "C-<kp-7>") 'projectile-run-eshell)
 (global-set-key (kbd "C-<kp-8>") 'projectile-run-shell)
+(global-set-key (kbd "C-<kp-9>") 'projectile-run-term)
 
 (require 'project-explorer)
 (global-set-key (kbd "M-§")
@@ -336,6 +339,8 @@
 ;;                 (lambda () (interactive)
 ;;                   (set-face-attribute 'default nil :height 105)))
 
+
+
 ;; CoffeeScript
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
 (add-to-list 'auto-mode-alist '("\\.coffee\\'" . coffee-mode))
@@ -347,8 +352,8 @@
 (add-hook 'markdown-mode-hook 'filladapt-mode)
 
 ;; Remove trailing whitespace unobtrusively
-(require 'ws-butler)
-(add-hook 'prog-mode-hook 'ws-butler-mode)
+;; (require 'ws-butler)
+;; (add-hook 'prog-mode-hook 'ws-butler-mode)
 
 ;; Better parens support
 (require 'mic-paren)
@@ -373,12 +378,16 @@
                               (add-hook 'after-revert-hook 'display-ansi-colors nil t)
                               ))
 
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+(autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
+(add-hook 'term-mode-hook 'ansi-color-for-comint-mode-on)
 
 ;; (add-hook 'syslog-mode-hook 'display-ansi-colors)
 ;; (add-hook 'syslog-mode-hook 'auto-revert-tail-mode)
 ;; (add-hook 'syslog-mode-hook 'read-only-mode)
 
-          
+
 ;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 ;;(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 
@@ -506,21 +515,23 @@
     (define-key newmap key def)))
 
 ;; JavaScript
-(require 'js2-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(require 'js3-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
 
-(add-hook 'js2-mode-hook (lambda ()
-                           (tern-mode t)
-                           (define-key tern-mode-keymap (kbd "M-.") nil)
-                           (define-key tern-mode-keymap (kbd "M-,") nil)
-                           (local-unset-key (kbd "C-c C-s"))
-                           (local-unset-key (kbd "M-."))
-                           ;; xref-js2
-                           (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)
-                           ;; Ctags
-                           ;; Tern
-                           ;;(local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
-                           (local-set-minor-mode-key 'smartparens-mode-map (kbd "C-<right>") 'sp-slurp-hybrid-sexp)))
+(defun my-js ()
+  (tern-mode t)
+  (define-key tern-mode-keymap (kbd "M-.") nil)
+  (define-key tern-mode-keymap (kbd "M-,") nil)
+  (local-unset-key (kbd "C-c C-s"))
+  (local-unset-key (kbd "M-."))
+  ;; xref-js2
+  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)
+  ;; Ctags
+  ;; Tern
+  ;;(local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
+  (local-set-minor-mode-key 'smartparens-mode-map (kbd "C-<right>") 'sp-slurp-hybrid-sexp))
+
+(add-hook 'js3-mode-hook 'my-js )
 (add-to-list 'company-backends 'company-tern)
 
 ;; TAGS
@@ -599,7 +610,10 @@
  '(helm-buffer-max-length nil)
  '(helm-lisp-fuzzy-completion t)
  '(helm-mode t)
+ '(helm-move-to-line-cycle-in-source t)
  '(helm-split-window-default-side (quote same))
+ '(helm-swoop-pre-input-function (lambda nil ""))
+ '(helm-swoop-split-with-multiple-windows t)
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
    (--map
@@ -686,7 +700,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (helm-swoop cider cider-eval-sexp-fu clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-cider helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
@@ -735,8 +749,11 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "DejaVu Sans Mono"))))
  '(cider-error-highlight-face ((t (:inherit nil :background "MistyRose1"))))
+ '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
  '(company-tooltip ((t (:background "wheat2"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
+ '(flycheck-error ((t (:background "misty rose" :underline nil))))
+ '(flycheck-warning ((t (:background "LightGoldenrod1" :underline nil))))
  '(fringe ((t (:background "#fdf6e3"))))
  '(helm-selection ((t (:background "sienna1" :foreground "White"))))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
