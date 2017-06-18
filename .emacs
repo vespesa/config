@@ -51,6 +51,27 @@
                                                            (interactive)
                                                            (eshell/clear-scrollback)))))
 
+;; Shell tweaks
+
+(defun wcy-shell-mode-hook-func  ()
+  (set-process-sentinel (get-buffer-process (current-buffer))
+                        #'wcy-shell-mode-kill-buffer-on-exit))
+(defun wcy-shell-mode-kill-buffer-on-exit (process state)
+  (message "%s" state)
+  (if (or
+       (string-match "exited abnormally with code.*" state)
+       (string-match "finished" state))
+      (kill-buffer (current-buffer))))
+
+(add-hook 'shell-mode-hook (lambda ()
+                             (wcy-shell-mode-hook-func)
+                             (ansi-color-for-comint-mode-on)
+                             (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+                             (local-set-key (kbd "C-l") 'comint-clear-buffer)
+                             (local-set-key (kbd "C-c C-l") 'comint-clear-buffer)))
+
+
+
 
 (defun comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region.
@@ -232,7 +253,10 @@
   ;; (require 'cljr-helm)
   ;; (define-key clojure-mode-map (kbd "C-c r") 'cljr-helm)
   (define-key clojure-mode-map (kbd "C-c C-a") 'clojure-align)
-  (define-key clojure-mode-map (kbd "C-c h") 'clojure-cheatsheet))
+  (define-key clojure-mode-map (kbd "C-c h") 'clojure-cheatsheet)
+  (define-clojure-indent
+    (fact [1])
+    (facts [1])))
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 
@@ -307,6 +331,13 @@
             (local-set-key (kbd "C-c s r") 'smerge-keep-mine)))
 
 
+;; Todo: projektor, smart-region, smooth-scrolling
+
+(require 'smooth-scrolling)
+(smooth-scrolling-mode 1)
+
+(global-set-key (kbd "C-,") 'smart-region)
+
 ;; Projectile
 (projectile-global-mode)
 (setq projectile-completion-system 'helm)
@@ -338,6 +369,10 @@
 ;; (global-set-key (kbd "C-s-+")
 ;;                 (lambda () (interactive)
 ;;                   (set-face-attribute 'default nil :height 105)))
+
+
+;; Projector (does not work)
+;; (require 'projector)
 
 
 
@@ -380,8 +415,12 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+;; Term
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 (add-hook 'term-mode-hook 'ansi-color-for-comint-mode-on)
+(defadvice term-handle-exit
+  (after term-kill-buffer-on-exit activate)
+(kill-buffer))
 
 ;; (add-hook 'syslog-mode-hook 'display-ansi-colors)
 ;; (add-hook 'syslog-mode-hook 'auto-revert-tail-mode)
@@ -397,17 +436,6 @@
 
 ;; Shell-mode tweaks
 ;; https://github.com/Hawstein/my-emacs/blob/master/_emacs/shell-buffer.el
-
-(add-hook 'shell-mode-hook 'wcy-shell-mode-hook-func)
-(defun wcy-shell-mode-hook-func  ()
-  (set-process-sentinel (get-buffer-process (current-buffer))
-                        #'wcy-shell-mode-kill-buffer-on-exit))
-(defun wcy-shell-mode-kill-buffer-on-exit (process state)
-  (message "%s" state)
-  (if (or
-       (string-match "exited abnormally with code.*" state)
-       (string-match "finished" state))
-      (kill-buffer (current-buffer))))
 
 (defun clear-comint-buffer ()
   (interactive)
@@ -598,9 +626,11 @@
  '(custom-theme-load-path
    (quote
     ("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/" "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2" custom-theme-directory t)) t)
+ '(display-buffer-alist (quote (("\\*shell" display-buffer-same-window (nil)))))
  '(exec-path
    (quote
     ("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin")))
+ '(explicit-shell-file-name nil)
  '(flycheck-disabled-checkers (quote (html-tidy)))
  '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
  '(fringe-mode (quote (1 . 1)) nil (fringe))
@@ -700,7 +730,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (projector smooth-scrolling smart-region better-shell cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
