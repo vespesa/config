@@ -150,19 +150,33 @@
 (add-hook 'after-init-hook 'exec-path-from-shell-initialize)
 
 ;; Helm
-(require 'helm)
-(require 'helm-config)
-(global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-x b") 'helm-buffers-list)
-;(global-set-key (kbd "C-c C-s") 'helm-do-ag-this-file)
-(global-set-key (kbd "C-s") 'helm-swoop)
+;; (require 'helm)
+;; (require 'helm-config)
+;; (global-set-key (kbd "M-x") 'helm-M-x)
+;; (global-set-key (kbd "C-x b") 'helm-buffers-list)
+;; (global-set-key (kbd "C-s") 'helm-swoop)
 
-(define-key helm-map (kbd "<tab>")    'helm-execute-persistent-action)
-(define-key helm-map (kbd "M-x") 'helm-select-action)
+;; (define-key helm-map (kbd "<tab>")    'helm-execute-persistent-action)
+;; (define-key helm-map (kbd "M-x") 'helm-select-action)
+
+;; Ivy
+(require 'ivy)
+(ivy-mode 1)
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+
+; Slim down ivy display
+;; (setq ivy-count-format ""
+;;       ivy-display-style nil
+;;       ivy-minibuffer-faces nil)
+
+;; Use Enter on a directory to navigate into the directory, not open it with dired.
+(define-key ivy-minibuffer-map (kbd "C-m") 'ivy-alt-done)
 
 ;; Ido ubiquitous
-(require 'ido-ubiquitous)
-(ido-ubiquitous-mode 1)
+;; (require 'ido-ubiquitous)
+;; (ido-ubiquitous-mode 1)
 
 ;; Flycheck
 (eval-after-load 'flycheck '(flycheck-clojure-setup))
@@ -200,39 +214,12 @@
 (define-key smartparens-mode-map (kbd "C-M-s") 'sp-split-sexp)
 (define-key smartparens-mode-map (kbd "C-M-j") 'sp-join-sexp)
 
-
 (sp-pair "(" ")" :wrap "M-(")
 (sp-pair "[" "]" :wrap "M-[")
 (sp-pair "{" "}" :wrap "M-{")
 
-
-;; Paredit
-;; (require 'paredit)
-;; (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-;; (add-hook 'lisp-mode-hook 'paredit-mode)
-;; (add-hook 'clojure-mode-hook 'paredit-mode)
-
-;; ;; Paxedit
-;; (require 'paxedit)
-;; (add-hook 'emacs-lisp-mode-hook 'paxedit-mode)
-;; (add-hook 'clojure-mode-hook 'paxedit-mode)
-
-;; (eval-after-load "paxedit"
-;;   '(progn (define-key paxedit-mode-map (kbd "M-ä") 'paxedit-transpose-forward)
-;;           (define-key paxedit-mode-map (kbd "M-ö") 'paxedit-transpose-backward)
-;;           (define-key paxedit-mode-map (kbd "M-<up>") 'paxedit-backward-up)
-;;           (define-key paxedit-mode-map (kbd "M-<down>") 'paxedit-backward-end)
-;;           (define-key paxedit-mode-map (kbd "M-<left>") 'paxedit-previous-symbol)
-;;           (define-key paxedit-mode-map (kbd "M-<right>") 'paxedit-next-symbol)
-;;           (define-key paxedit-mode-map (kbd "C-M-c") 'paxedit-copy)
-;;           (define-key paxedit-mode-map (kbd "C-M-k") 'paxedit-kill)
-;;           (define-key paxedit-mode-map (kbd "C-<backspace>") 'paxedit-delete)
-;;           (define-key paxedit-mode-map (kbd "C-M-<up>") 'paxedit-sexp-raise)
-;;           (define-key paxedit-mode-map (kbd "M-u") 'paxedit-symbol-change-case)
-;;           (define-key paxedit-mode-map (kbd "C-ä") 'paxedit-symbol-copy)
-;;           (define-key paxedit-mode-map (kbd "C-ö") 'paxedit-symbol-kill)
-;;           (define-key paxedit-mode-map (kbd "C-,") 'paxedit-wrap-comment)
-;;           (define-key paxedit-mode-map (kbd "C-M-<down>") 'paxedit-dissolve)))
+;; sp-kill-hybrid-sexp does not work in text-mode.
+(add-to-list 'auto-mode-alist '(".*/i18n/.*\\.txt" . fundamental-mode))
 
 ;; Clojure
 (require 'clojure-mode-extra-font-locking)
@@ -240,7 +227,6 @@
 ;; (add-hook 'clojure-mode (local-unset-key "}"))
 ;; (add-hook 'clojure-mode (local-unset-key "{"))
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-
 
 (add-hook 'after-init-hook 'global-color-identifiers-mode)
 
@@ -268,7 +254,7 @@
 
 ;;(add-hook 'cider-repl-mode-hook 'paredit-mode)
 (setq cider-repl-use-pretty-printing t)
-(helm-cider-mode 1)
+;;(helm-cider-mode 1)
 (setq cider-show-error-buffer nil)
 (setq nrepl-log-messages nil)
 
@@ -340,20 +326,20 @@
 
 ;; Projectile
 (projectile-global-mode)
-(setq projectile-completion-system 'helm)
-(helm-projectile-on)
+;; (setq projectile-completion-system 'helm)
+;; (helm-projectile-on)
 
-(global-set-key (kbd "C-c S")
-                (lambda () (interactive)
-                  (helm-projectile-ag)))
+;; (global-set-key (kbd "C-c S")
+;;                 (lambda () (interactive)
+;;                   (helm-projectile-ag)))
 (global-set-key (kbd "s-.") 'projectile-find-tag)
 (global-set-key (kbd "s-,") 'pop-tag-mark)
-(global-set-key (kbd "H-p") 'helm-projectile-find-file)
+;; (global-set-key (kbd "H-p") 'helm-projectile-find-file)
 (global-set-key (kbd "H-1") 'projectile-run-eshell)
 (global-set-key (kbd "H-2") 'projectile-run-shell)
 (global-set-key (kbd "H-3") 'projectile-run-term)
-(global-set-key (kbd "<f13>") 'helm-projectile-find-file)
-(global-set-key (kbd "<f16>") 'helm-projectile-find-file)
+;; (global-set-key (kbd "<f13>") 'helm-projectile-find-file)
+;; (global-set-key (kbd "<f16>") 'helm-projectile-find-file)
 (global-set-key (kbd "C-<kp-7>") 'projectile-run-eshell)
 (global-set-key (kbd "C-<kp-8>") 'projectile-run-shell)
 (global-set-key (kbd "C-<kp-9>") 'projectile-run-term)
@@ -363,6 +349,16 @@
                 (lambda () (interactive)
                   (project-explorer-toggle)))
 
+;; Counsel-projectile
+(counsel-projectile-on)
+(global-set-key (kbd "C-c S")
+                (lambda () (interactive)
+                  (counsel-projectile-rg)))
+(global-set-key (kbd "H-p") 'counsel-projectile-find-file)
+(global-set-key (kbd "<f13>") 'counsel-projectile-find-file)
+(global-set-key (kbd "<f16>") 'counsel-projectile-find-file)
+
+
 ;; (global-set-key (kbd "s-+")
 ;;                 (lambda () (interactive)
 ;;                   (set-face-attribute 'default nil :height 110)))
@@ -371,10 +367,28 @@
 ;;                   (set-face-attribute 'default nil :height 105)))
 
 
-;; Projector (does not work)
-;; (require 'projector)
+;; Projector
+(require 'projector)
 
 
+;; Prodigy
+(prodigy-define-service
+  :name "Figwheel"
+  :command "lein"
+  :args '("figwheel")
+  :cwd "~/projects/lupapiste"
+  :tags '()
+  :stop-signal 'sigkill
+  :kill-process-buffer-on-stop t)
+
+(prodigy-define-service
+  :name "Sass"
+  :command "lein"
+  :args '("sass4clj" "auto")
+  :cwd "~/projects/lupapiste"
+  :tags '()
+  :stop-signal 'sigkill
+  :kill-process-buffer-on-stop t)
 
 ;; CoffeeScript
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
@@ -575,7 +589,7 @@
 (add-hook 'robot-mode-hook #'(lambda () (autopair-mode)))
 
 ;; imenu-anywhere
-(global-set-key (kbd "C-.") #'helm-imenu-anywhere)
+;;(global-set-key (kbd "C-.") #'helm-imenu-anywhere)
 
 ;; dumb-jump
 ;;(dumb-jump-mode)
@@ -639,7 +653,7 @@
     ("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "public")))
  '(helm-buffer-max-length nil)
  '(helm-lisp-fuzzy-completion t)
- '(helm-mode t)
+ '(helm-mode nil)
  '(helm-move-to-line-cycle-in-source t)
  '(helm-split-window-default-side (quote same))
  '(helm-swoop-pre-input-function (lambda nil ""))
@@ -668,6 +682,8 @@
    (quote
     ("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3")))
  '(inhibit-startup-screen t)
+ '(ivy-height 20)
+ '(ivy-wrap t)
  '(js-indent-level 2)
  '(js2-bounce-indent-p nil)
  '(js2-consistent-level-indent-inner-bracket t)
@@ -730,10 +746,11 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (projector smooth-scrolling smart-region better-shell cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
+ '(projectile-completion-system (quote ivy))
  '(projectile-enable-idle-timer t)
  '(projectile-use-git-grep t)
  '(safe-local-variable-values (quote ((encoding . utf-8))))
@@ -786,6 +803,13 @@
  '(flycheck-warning ((t (:background "LightGoldenrod1" :underline nil))))
  '(fringe ((t (:background "#fdf6e3"))))
  '(helm-selection ((t (:background "sienna1" :foreground "White"))))
+ '(ivy-current-match ((t (:background "sienna1" :foreground "white"))))
+ '(ivy-minibuffer-match-face-1 ((t nil)))
+ '(ivy-minibuffer-match-face-2 ((t (:background "chocolate1" :foreground "white"))))
+ '(ivy-minibuffer-match-face-3 ((t (:background "tan2" :foreground "white"))))
+ '(ivy-minibuffer-match-face-4 ((t (:background "LightSalmon1" :foreground "white"))))
+ '(ivy-modified-buffer ((t (:foreground "firebrick"))))
+ '(ivy-virtual ((t nil)))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
  '(web-mode-current-column-highlight-face ((t (:background "bisque")))))
