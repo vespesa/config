@@ -24,7 +24,7 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-z") 'zap-up-to-char)
 
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+;(global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 (global-set-key (kbd "C-x !") 'eshell)
 (global-set-key (kbd "C-x \"") 'shell)
@@ -268,7 +268,8 @@
           (lambda ()
             (eldoc-mode t)
             (define-key cider-repl-mode-map (kbd "s-'") 'cider-switch-to-last-clojure-buffer)
-            (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)))
+            (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)
+            ))
 
 ;; Magit (Git support)
 (require 'magit)
@@ -325,6 +326,7 @@
 (global-set-key (kbd "C-,") 'smart-region)
 
 ;; Projectile
+
 (projectile-global-mode)
 ;; (setq projectile-completion-system 'helm)
 ;; (helm-projectile-on)
@@ -351,7 +353,7 @@
 
 ;; Counsel-projectile
 (counsel-projectile-on)
-(global-set-key (kbd "C-c S")
+(global-set-key (kbd "C-c C-s")
                 (lambda () (interactive)
                   (counsel-projectile-rg)))
 (global-set-key (kbd "H-p") 'counsel-projectile-find-file)
@@ -599,6 +601,25 @@
 ;; (setq paradox-github-token "github personal tokem" )
 (load "paradox-token")
 
+;; Eyebrowse
+;; (eyebrowse-mode t)
+;; (define-key eyebrowse-mode-map (kbd "C-s-<right>") 'eyebrowse-next-window-config)
+;; (define-key eyebrowse-mode-map (kbd "C-s-<left>") 'eyebrowse-prev-window-config)
+
+(defun bjm/kill-this-buffer ()
+  "Kill the current buffer."
+  (interactive)
+  (kill-buffer (current-buffer)))
+
+(global-set-key (kbd "C-x k") 'bjm/kill-this-buffer)
+
+;; Perspective
+(persp-mode t)
+(define-key persp-mode-map (kbd "C-s-<right>") 'persp-next)
+(define-key persp-mode-map (kbd "C-s-<left>") 'persp-prev)
+
+(global-set-key (kbd "C--") 'flash-line-highlight)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -607,6 +628,10 @@
  '(auto-revert-check-vc-info nil)
  '(auto-revert-interval 2)
  '(avy-all-windows nil)
+ '(beacon-blink-when-focused t)
+ '(beacon-blink-when-window-scrolls nil)
+ '(beacon-color "DarkOrange1")
+ '(beacon-mode nil)
  '(blink-cursor-mode nil)
  '(c-basic-offset 2)
  '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)))
@@ -645,6 +670,7 @@
    (quote
     ("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin")))
  '(explicit-shell-file-name nil)
+ '(eyebrowse-wrap-around t)
  '(flycheck-disabled-checkers (quote (html-tidy)))
  '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
  '(fringe-mode (quote (1 . 1)) nil (fringe))
@@ -746,12 +772,14 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (nav-flash hl-line+ perspective eyebrowse beacon prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
+ '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(projectile-completion-system (quote ivy))
  '(projectile-enable-idle-timer t)
+ '(projectile-mode-line nil)
  '(projectile-use-git-grep t)
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(scss-compile-at-save nil)
@@ -803,6 +831,7 @@
  '(flycheck-warning ((t (:background "LightGoldenrod1" :underline nil))))
  '(fringe ((t (:background "#fdf6e3"))))
  '(helm-selection ((t (:background "sienna1" :foreground "White"))))
+ '(hl-line ((t (:background "tan1"))))
  '(ivy-current-match ((t (:background "sienna1" :foreground "white"))))
  '(ivy-minibuffer-match-face-1 ((t nil)))
  '(ivy-minibuffer-match-face-2 ((t (:background "chocolate1" :foreground "white"))))
