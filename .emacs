@@ -268,8 +268,25 @@
           (lambda ()
             (eldoc-mode t)
             (define-key cider-repl-mode-map (kbd "s-'") 'cider-switch-to-last-clojure-buffer)
-            (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)
-            ))
+            (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)))
+
+;; Figwheel + Cider
+
+(setq cider-cljs-lein-repl
+      "(do (require 'figwheel-sidecar.repl-api)
+           (figwheel-sidecar.repl-api/start-figwheel!)
+           (figwheel-sidecar.repl-api/cljs-repl))")
+
+(defun cider-figwheel-repl ()
+  (interactive)
+  (save-some-buffers)
+  (with-current-buffer (cider-current-repl-buffer)
+    (goto-char (point-max))
+    (insert "(require 'figwheel-sidecar.repl-api)
+             (figwheel-sidecar.repl-api/start-figwheel!) ; idempotent
+             (figwheel-sidecar.repl-api/cljs-repl)")
+    (cider-repl-return)))
+
 
 ;; Magit (Git support)
 (require 'magit)
@@ -352,7 +369,6 @@
                   (project-explorer-toggle)))
 
 ;; Counsel-projectile
-(counsel-projectile-on)
 (global-set-key (kbd "C-c C-s")
                 (lambda () (interactive)
                   (counsel-projectile-rg)))
@@ -470,7 +486,7 @@
 (setq sm/theme 'light)
 (sml/setup)
 
-(require 'sunrise-commander)
+;; (require 'sunrise-commander)
 
 ;; Org
 ;;(require 'org)
@@ -478,22 +494,24 @@
 ;; (define-key global-map "\C-ca" 'org-agenda)
 ;; (define-key global-map "\C-cc" 'org-capture)
 ;; (setq org-log-done t)
-(require 'org-journal)
-(add-hook 'org-journal-mode-hook (lambda ()
-                                   (local-set-key (kbd "C-c C-c") (lambda ()
-                                                                    (interactive)
-                                                                   (save-buffer)
-                                                                   (kill-buffer)
-                                                                   (delete-window)))
-                                   (local-set-key (kbd "C-c C-k") (lambda ()
-                                                                    (interactive)
-                                                                    (es-kill-buffer-dont-ask)
-                                                                    (delete-window)))
-                                   (local-set-key (kbd "C-c r") (lambda ()
-                                                                    (interactive)
-                                                                    (org-mode-restart)))))
-(global-set-key (kbd "C-c f") 'org-journal-search-forever)
-(global-set-key (kbd "C-c j") 'org-journal-new-entry)
+
+;; Deprecated. Using Deft now.
+;; (require 'org-journal)
+;; (add-hook 'org-journal-mode-hook (lambda ()
+;;                                    (local-set-key (kbd "C-c C-c") (lambda ()
+;;                                                                     (interactive)
+;;                                                                    (save-buffer)
+;;                                                                    (kill-buffer)
+;;                                                                    (delete-window)))
+;;                                    (local-set-key (kbd "C-c C-k") (lambda ()
+;;                                                                     (interactive)
+;;                                                                     (es-kill-buffer-dont-ask)
+;;                                                                     (delete-window)))
+;;                                    (local-set-key (kbd "C-c r") (lambda ()
+;;                                                                     (interactive)
+;;                                                                     (org-mode-restart)))))
+;; (global-set-key (kbd "C-c f") 'org-journal-search-forever)
+;; (global-set-key (kbd "C-c j") 'org-journal-new-entry)
 
 ;; SCSS (Sass)
 ;;(require 'scss-mode)
@@ -652,6 +670,7 @@
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
  '(compilation-message-face (quote default))
+ '(counsel-projectile-mode t nil (counsel-projectile))
  '(css-indent-offset 2)
  '(cua-global-mark-cursor-color "#2aa198")
  '(cua-normal-cursor-color "#657b83")
@@ -772,7 +791,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (nav-flash hl-line+ perspective eyebrowse beacon prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (deft nav-flash hl-line+ perspective eyebrowse beacon prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
