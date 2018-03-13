@@ -35,6 +35,7 @@
 (global-set-key (kbd "s-1") (lambda () (interactive)
                               (display-buffer "*eshell*" nil nil)
                               (switch-to-buffer-other-window "*eshell*" )))
+(global-set-key [remap kill-ring-save] 'easy-kill)
 
 (defun eshell/old-clear ()
   "Clear the eshell buffer."
@@ -135,7 +136,7 @@
     (map 'list (lambda (a)
                  (goto-char (point-min))
                  (while (search-forward (string a) nil t)
-                   (replace-match (format "\\\\u%04x" a) t))) "äöåÄÖÅ")
+                   (replace-match (format "\\\\u%04x" a) t))) "äöåÄÖÅ§€")
     (goto-char p)))
 
 
@@ -271,6 +272,11 @@
             (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)))
 
 ;; Figwheel + Cider
+;; (require 'cider)
+;; (defun cider-check-figwheel-requirements ()
+;;   "Check whether we can start a Figwheel ClojureScript REPL."
+;;   t)
+
 
 (setq cider-cljs-lein-repl
       "(do (require 'figwheel-sidecar.repl-api)
@@ -340,7 +346,7 @@
 (require 'smooth-scrolling)
 (smooth-scrolling-mode 1)
 
-(global-set-key (kbd "C-,") 'smart-region)
+(global-set-key (kbd "C-,") 'string-rectangle)
 
 ;; Projectile
 
@@ -417,6 +423,7 @@
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 (add-hook 'markdown-mode-hook 'pandoc-mode)
 (add-hook 'markdown-mode-hook 'filladapt-mode)
+(add-hook 'markdown-mode-hook 'turn-on-auto-fill)
 
 ;; Remove trailing whitespace unobtrusively
 ;; (require 'ws-butler)
@@ -638,6 +645,12 @@
 
 (global-set-key (kbd "C--") 'flash-line-highlight)
 
+;; Origami
+(require 'origami)
+(global-origami-mode t)
+(define-key origami-mode-map (kbd "s-o") 'origami-recursively-toggle-node)
+(define-key origami-mode-map (kbd "s-t") 'origami-toggle-all-nodes)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -684,6 +697,9 @@
  '(custom-theme-load-path
    (quote
     ("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/" "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2" custom-theme-directory t)) t)
+ '(deft-auto-save-interval 60.0)
+ '(deft-extensions (quote ("md" "txt" "text" "markdown" "org")))
+ '(deft-markdown-mode-title-level 2)
  '(display-buffer-alist (quote (("\\*shell" display-buffer-same-window (nil)))))
  '(exec-path
    (quote
@@ -791,7 +807,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (deft nav-flash hl-line+ perspective eyebrowse beacon prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell cider helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (easy-kill origami deft nav-flash hl-line+ perspective eyebrowse beacon prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell helm-cider helm-swoop clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode helm-projectile helm-clojuredocs helm-ag git-gutter+ ggtags flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
@@ -799,8 +815,12 @@
  '(projectile-completion-system (quote ivy))
  '(projectile-enable-idle-timer t)
  '(projectile-mode-line nil)
+ '(projectile-tags-command "")
  '(projectile-use-git-grep t)
- '(safe-local-variable-values (quote ((encoding . utf-8))))
+ '(safe-local-variable-values
+   (quote
+    ((cider-default-cljs-repl . "Figwheel")
+     (encoding . utf-8))))
  '(scss-compile-at-save nil)
  '(show-paren-mode nil)
  '(show-smartparens-global-mode t)
