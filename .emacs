@@ -72,7 +72,12 @@
                              (local-set-key (kbd "C-c C-l") 'comint-clear-buffer)))
 
 
-
+(defun reverse-text (beg end)
+ "Reverse characters between BEG and END."
+ (interactive "r")
+ (let ((region (buffer-substring beg end)))
+   (delete-region beg end)
+   (insert (nreverse region))))
 
 (defun comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region.
@@ -645,11 +650,17 @@
 
 (global-set-key (kbd "C--") 'flash-line-highlight)
 
-;; Origami
-(require 'origami)
-(global-origami-mode t)
-(define-key origami-mode-map (kbd "s-o") 'origami-recursively-toggle-node)
-(define-key origami-mode-map (kbd "s-t") 'origami-toggle-all-nodes)
+;; Folding
+;; (require 'origami) ;; Not usable in with large files.
+;; (global-origami-mode t)
+;; (define-key origami-mode-map (kbd "s-o") 'origami-recursively-toggle-node)
+;; (define-key origami-mode-map (kbd "s-t") 'origami-toggle-all-nodes)
+
+(global-set-key (kbd "s-o") 'hs-toggle-hiding)
+(global-set-key (kbd "s-t") 'hs-hide-all)
+(global-set-key (kbd "s-y") 'hs-show-all)
+(add-hook 'prog-mode-hook #'hs-minor-mode)
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
