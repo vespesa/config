@@ -323,7 +323,7 @@
 ;(setq magit-last-seen-setup-instructions "1.4.0")
 (global-set-key (kbd "C-x g") 'magit-status)
 
-(global-git-gutter+-mode t)
+(global-git-gutter-mode t)
 
 ;; Git-flow
 (require 'magit-gitflow)
@@ -398,7 +398,7 @@
                   (project-explorer-toggle)))
 
 ;; Counsel-projectile
-(global-set-key (kbd "C-c C-s")
+(global-set-key (kbd "s-s")
                 (lambda () (interactive)
                   (counsel-projectile-rg)))
 (global-set-key (kbd "H-p") 'counsel-projectile-find-file)
@@ -584,6 +584,7 @@
                             (local-unset-key (kbd "C-c C-s"))))
 
 (add-to-list 'auto-mode-alist '("\\.xml\\'" . html-mode ))
+(add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode ))
 
 ;; Avy
 (avy-setup-default)
@@ -607,8 +608,8 @@
     (define-key newmap key def)))
 
 ;; JavaScript
-(require 'js3-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
+;;(require 'js3-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
 (defun my-js ()
   (tern-mode t)
@@ -622,10 +623,9 @@
   ;; Tern
   ;;(local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
   (local-set-minor-mode-key 'smartparens-mode-map (kbd "C-<right>") 'sp-slurp-hybrid-sexp)
-  ;;(local-set-minor-mode-key 'js-mode-map (kbd "s-o") 'js3-mode-toggle-element)
-  )
+  (local-set-minor-mode-key 'js-mode-map (kbd "s-o") 'js2-mode-toggle-element))
 
-(add-hook 'js3-mode-hook 'my-js )
+(add-hook 'js2-mode-hook 'my-js )
 (add-to-list 'company-backends 'company-tern)
 
 ;; TAGS
@@ -698,7 +698,7 @@
  '(beacon-mode nil)
  '(blink-cursor-mode nil)
  '(c-basic-offset 2)
- '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)) t)
+ '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)))
  '(calendar-week-start-day 1)
  '(cider-pprint-fn (quote fipp))
  '(cider-prompt-for-symbol nil)
@@ -840,7 +840,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (cider xterm-color easy-kill origami deft nav-flash hl-line+ perspective eyebrowse beacon prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode git-gutter+ ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-tern company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (git-gutter cider xterm-color easy-kill origami deft nav-flash hl-line+ perspective eyebrowse beacon prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
@@ -896,14 +896,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "DejaVu Sans Mono"))))
+ '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "Monaco"))))
  '(cider-error-highlight-face ((t (:inherit nil :background "MistyRose1"))))
  '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
  '(company-tooltip ((t (:background "wheat2"))))
- '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
+ '(eshell-prompt ((t (:foreground "dark green" :weight normal))) t)
  '(flycheck-error ((t (:background "misty rose" :underline nil))))
  '(flycheck-warning ((t (:background "LightGoldenrod1" :underline nil))))
  '(fringe ((t (:background "#fdf6e3"))))
+ '(git-gutter:added ((t (:foreground "light green" :weight bold))))
+ '(git-gutter:modified ((t (:foreground "SkyBlue1" :weight bold))))
  '(helm-selection ((t (:background "sienna1" :foreground "White"))))
  '(hl-line ((t (:background "tan1"))))
  '(ivy-current-match ((t (:background "sienna1" :foreground "white"))))
