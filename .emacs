@@ -415,19 +415,10 @@
 
 
 ;; Projector
-(require 'projector)
+;; (require 'projector)
 
 
 ;; Prodigy
-(prodigy-define-service
-  :name "Figwheel"
-  :command "lein"
-  :args '("figwheel")
-  :cwd "~/projects/lupapiste"
-  :tags '()
-  :stop-signal 'sigkill
-  :kill-process-buffer-on-stop t)
-
 (prodigy-define-service
   :name "Sass"
   :command "lein"
@@ -638,7 +629,9 @@
 (load "robot-mode")
 (require 'autopair)
 (add-to-list 'auto-mode-alist '("\\.robot\\'" . robot-mode))
-(add-hook 'robot-mode-hook #'(lambda () (autopair-mode)))
+(add-hook 'robot-mode-hook #'(lambda ()
+                               (autopair-mode)
+                               (setq c-basic-offset 2)))
 
 ;; imenu-anywhere
 ;;(global-set-key (kbd "C-.") #'helm-imenu-anywhere)
@@ -698,7 +691,7 @@
  '(beacon-mode nil)
  '(blink-cursor-mode nil)
  '(c-basic-offset 2)
- '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)))
+ '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)) t)
  '(calendar-week-start-day 1)
  '(cider-pprint-fn (quote fipp))
  '(cider-prompt-for-symbol nil)
@@ -716,7 +709,6 @@
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
  '(compilation-message-face (quote default))
- '(counsel-projectile-mode t nil (counsel-projectile))
  '(css-indent-offset 2)
  '(cua-global-mark-cursor-color "#2aa198")
  '(cua-normal-cursor-color "#657b83")
@@ -840,7 +832,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (git-gutter cider xterm-color easy-kill origami deft nav-flash hl-line+ perspective eyebrowse beacon prodigy projectile-ripgrep smex swiper counsel counsel-projectile ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox projectile python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (counsel-projectile projectile-ripgrep git-gutter cider xterm-color easy-kill origami deft nav-flash hl-line+ perspective eyebrowse beacon prodigy smex swiper counsel ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
