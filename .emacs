@@ -691,7 +691,7 @@
  '(beacon-mode nil)
  '(blink-cursor-mode nil)
  '(c-basic-offset 2)
- '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)) t)
+ '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)))
  '(calendar-week-start-day 1)
  '(cider-pprint-fn (quote fipp))
  '(cider-prompt-for-symbol nil)
@@ -889,7 +889,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "Monaco"))))
+ '(cider-deprecated-face ((t (:background "#432" :foreground "#ccc"))))
  '(cider-error-highlight-face ((t (:inherit nil :background "MistyRose1"))))
+ '(cider-result-overlay-face ((t (:background "lightgreen" :box (:line-width -1 :color "black")))))
  '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
  '(company-tooltip ((t (:background "wheat2"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))) t)
