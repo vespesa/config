@@ -20,7 +20,6 @@
 (require 'saveplace)
 (setq-default save-place t)
 
-(global-set-key (kbd "M-/") 'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-z") 'zap-up-to-char)
 
@@ -237,6 +236,7 @@
 (define-key smartparens-mode-map (kbd "C-M-<down>") 'sp-unwrap-sexp)
 (define-key smartparens-mode-map (kbd "C-M-s") 'sp-split-sexp)
 (define-key smartparens-mode-map (kbd "C-M-j") 'sp-join-sexp)
+(define-key smartparens-mode-map (kbd "M-<backspace>") 'sp-backward-delete-word)
 
 (sp-pair "(" ")" :wrap "M-(")
 (sp-pair "[" "]" :wrap "M-[")
@@ -258,7 +258,7 @@
   ;; clj-refactor loads too much ns on connect. Do not use!
   ;; (require 'clj-refactor)
   ;; (clj-refactor-mode 1)
-  (yas-minor-mode 1) ; for adding require/use/import
+  ;; (yas-minor-mode 1) ; for adding require/use/import
   ;; (cljr-add-keybindings-with-prefix "C-c C-m")
   ;; (require 'cljr-helm)
   ;; (define-key clojure-mode-map (kbd "C-c r") 'cljr-helm)
@@ -266,6 +266,7 @@
   (define-key clojure-mode-map (kbd "C-c h") 'clojure-cheatsheet)
   (define-clojure-indent
     (fact [1])
+    (fact* [1])
     (facts [1])))
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
@@ -676,6 +677,14 @@
 (global-set-key (kbd "s-y") 'hs-show-all)
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 
+;; SSH
+
+(setq ssh-directory-tracking-mode 'ftp)
+(add-hook 'ssh-mode-hook
+          (lambda ()
+            (shell-dirtrack-mode t)
+            (setq dirtrackp nil)))
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -693,7 +702,7 @@
  '(c-basic-offset 2)
  '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)))
  '(calendar-week-start-day 1)
- '(cider-pprint-fn (quote fipp))
+ '(cider-pprint-fn (quote zprint))
  '(cider-prompt-for-symbol nil)
  '(cider-repl-display-in-current-window t)
  '(coffee-tab-width 2)
@@ -832,7 +841,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (counsel-projectile projectile-ripgrep git-gutter cider xterm-color easy-kill origami deft nav-flash hl-line+ perspective eyebrowse beacon prodigy smex swiper counsel ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme yasnippet ws-butler win-switch web-mode tagedit syslog-mode swiper-helm sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup paxedit pandoc-mode pandoc multiple-cursors monky mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ahg ag ace-window 4clojure)))
+    (ssh cider yaml-mode groovy-mode make-color deadgrep iedit tramp-term counsel-tramp counsel-projectile projectile-ripgrep git-gutter xterm-color easy-kill deft hl-line+ perspective beacon prodigy smex swiper counsel ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme ws-butler win-switch web-mode tagedit syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup pandoc-mode pandoc multiple-cursors mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
@@ -873,6 +882,7 @@
  '(speedbar-show-unknown-files t)
  '(speedbar-use-images nil)
  '(sr-speedbar-right-side nil)
+ '(ssh-directory-tracking-mode t)
  '(tags-add-tables nil)
  '(tags-revert-without-query t)
  '(term-default-bg-color "#fdf6e3")
@@ -909,8 +919,12 @@
  '(ivy-minibuffer-match-face-4 ((t (:background "LightSalmon1" :foreground "white"))))
  '(ivy-modified-buffer ((t (:foreground "firebrick"))))
  '(ivy-virtual ((t nil)))
+ '(lazy-highlight ((t (:background "paleturquoise2"))))
+ '(mode-line ((t (:background "papaya whip" :foreground "black" :box (:line-width 1 :color "#657b83") :weight normal))))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
+ '(region ((t (:background "light cyan" :inverse-video nil))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
  '(web-mode-current-column-highlight-face ((t (:background "bisque")))))
 (put 'erase-buffer 'disabled nil)
 (put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
