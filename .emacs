@@ -277,9 +277,6 @@
 ;;(add-hook 'clojure-mode-hook 'cider-turn-on-eldoc-mode)
 (setq nrepl-hide-special-buffers nil)
 
-;;(add-hook 'cider-repl-mode-hook 'paredit-mode)
-(setq cider-repl-use-pretty-printing t)
-;;(helm-cider-mode 1)
 (setq cider-show-error-buffer nil)
 (setq nrepl-log-messages nil)
 
@@ -293,7 +290,8 @@
           (lambda ()
             (eldoc-mode t)
             (define-key cider-repl-mode-map (kbd "s-'") 'cider-switch-to-last-clojure-buffer)
-            (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)))
+            (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)
+            (define-key cider-repl-mode-map (kbd "<S-return>") 'cider-repl-newline-and-indent)))
 
 ;; Figwheel + Cider
 ;; (require 'cider)
@@ -418,16 +416,6 @@
 ;; Projector
 ;; (require 'projector)
 
-
-;; Prodigy
-(prodigy-define-service
-  :name "Sass"
-  :command "lein"
-  :args '("sass4clj" "auto")
-  :cwd "~/projects/lupapiste"
-  :tags '()
-  :stop-signal 'sigkill
-  :kill-process-buffer-on-stop t)
 
 ;; CoffeeScript
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
@@ -685,6 +673,8 @@
             (shell-dirtrack-mode t)
             (setq dirtrackp nil)))
 
+;; Project specific configurations
+(load "~/projects/config.el")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -703,8 +693,10 @@
  '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)))
  '(calendar-week-start-day 1)
  '(cider-pprint-fn (quote zprint))
+ '(cider-print-fn (quote zprint))
  '(cider-prompt-for-symbol nil)
  '(cider-repl-display-in-current-window t)
+ '(cider-repl-use-pretty-printing nil)
  '(coffee-tab-width 2)
  '(comint-prompt-read-only t)
  '(company-backends
@@ -739,6 +731,9 @@
  '(exec-path
    (quote
     ("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin")))
+ '(exec-path-from-shell-variables
+   (quote
+    ("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS")))
  '(explicit-shell-file-name nil)
  '(eyebrowse-wrap-around t)
  '(flycheck-disabled-checkers (quote (html-tidy)))
@@ -777,6 +772,7 @@
  '(hl-fg-colors
    (quote
     ("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3")))
+ '(ido-cr+-auto-update-blacklist t)
  '(inhibit-startup-screen t)
  '(ivy-height 20)
  '(ivy-wrap t)
@@ -841,19 +837,20 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (ssh cider yaml-mode groovy-mode make-color deadgrep iedit tramp-term counsel-tramp counsel-projectile projectile-ripgrep git-gutter xterm-color easy-kill deft hl-line+ perspective beacon prodigy smex swiper counsel ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme ws-butler win-switch web-mode tagedit syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup pandoc-mode pandoc multiple-cursors mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
+    (defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term counsel-tramp counsel-projectile projectile-ripgrep git-gutter xterm-color easy-kill deft hl-line+ perspective beacon prodigy smex swiper counsel ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme ws-butler win-switch web-mode tagedit syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup pandoc-mode pandoc multiple-cursors mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(projectile-completion-system (quote ivy))
- '(projectile-enable-idle-timer t)
+ '(projectile-enable-idle-timer nil)
  '(projectile-mode-line nil)
  '(projectile-tags-command "")
  '(projectile-use-git-grep t)
  '(safe-local-variable-values
    (quote
-    ((cider-default-cljs-repl . figwheel)
+    ((cider-default-cljs-repl . "figwheel")
+     (cider-default-cljs-repl . figwheel)
      (cider-default-cljs-repl quote figwheel)
      (cider-default-cljs-repl . "Figwheel")
      (encoding . utf-8))))
@@ -882,7 +879,7 @@
  '(speedbar-show-unknown-files t)
  '(speedbar-use-images nil)
  '(sr-speedbar-right-side nil)
- '(ssh-directory-tracking-mode t)
+ '(ssh-directory-tracking-mode t t)
  '(tags-add-tables nil)
  '(tags-revert-without-query t)
  '(term-default-bg-color "#fdf6e3")
@@ -904,7 +901,7 @@
  '(cider-result-overlay-face ((t (:background "lightgreen" :box (:line-width -1 :color "black")))))
  '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
  '(company-tooltip ((t (:background "wheat2"))))
- '(eshell-prompt ((t (:foreground "dark green" :weight normal))) t)
+ '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
  '(flycheck-error ((t (:background "misty rose" :underline nil))))
  '(flycheck-warning ((t (:background "LightGoldenrod1" :underline nil))))
  '(fringe ((t (:background "#fdf6e3"))))
