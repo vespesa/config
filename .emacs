@@ -213,6 +213,9 @@
 (company-quickhelp-mode 1)
 (setq company-global-modes '(not eshell-mode))
 
+;; Flyspell
+(add-hook 'prog-mode-hook #'flyspell-prog-mode)
+
 
 ;; Smartparens
 (require 'smartparens-config)
