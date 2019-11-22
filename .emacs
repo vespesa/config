@@ -214,7 +214,12 @@
 (setq company-global-modes '(not eshell-mode))
 
 ;; Flyspell
-(add-hook 'prog-mode-hook #'flyspell-prog-mode)
+
+(require 'flyspell-lazy)
+
+(flyspell-lazy-mode 1)
+
+;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
 
 ;; Smartparens
@@ -270,7 +275,12 @@
   (define-clojure-indent
     (fact [1])
     (fact* [1])
-    (facts [1])))
+    (facts [1])
+    (for-frag [1])
+    (pcond-> [1])
+    (pcond->> [1]))
+  (set-fill-column 110)
+  (setq clojure-align-separator "---"))
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 
@@ -287,14 +297,44 @@
           (lambda ()
             (global-set-key (kbd "s-'")'cider-switch-to-repl-buffer)
             (global-set-key (kbd "s-å") (lambda () (interactive) (display-buffer "*cider-error*" nil nil)))
-            (define-key cider-mode-map (kbd "C-c TAB") 'cider-format-defun)))
+            (define-key cider-mode-map (kbd "C-c TAB") 'cider-format-defun)
+            (define-key cider-mode-map (kbd "<C-tab>") 'cider-format-defun)))
 
 (add-hook 'cider-repl-mode-hook
           (lambda ()
             (eldoc-mode t)
             (define-key cider-repl-mode-map (kbd "s-'") 'cider-switch-to-last-clojure-buffer)
             (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)
-            (define-key cider-repl-mode-map (kbd "<S-return>") 'cider-repl-newline-and-indent)))
+            (define-key cider-repl-mode-map (kbd "<S-return>") 'cider-repl-newline-and-indent)
+            (define-key cider-repl-mode-map (kbd "s-*") 'cider-repl-toggle-pretty-printing)))
+
+(defun java8 ()
+  (interactive)
+  (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home"))
+(defun java11 ()
+  (interactive)
+  (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home"))
+
+(defun java8-cider-jack-in ()
+  (interactive)
+  (java8)
+  (cider-jack-in nil))
+
+(defun java8-cider-jack-in-clj&cljs ()
+  (interactive)
+  (java8)
+  (cider-jack-in-clj&cljs nil nil))
+
+(defun java11-cider-jack-in ()
+  (interactive)
+  (java11)
+  (cider-jack-in nil))
+
+(defun java11-cider-jack-in-clj&cljs ()
+  (interactive)
+  (java11)
+  (cider-jack-in-clj&cljs nil nil))
+
 
 ;; Figwheel + Cider
 ;; (require 'cider)
@@ -700,6 +740,11 @@
  '(cider-prompt-for-symbol nil)
  '(cider-repl-display-in-current-window t)
  '(cider-repl-use-pretty-printing nil)
+ '(clojure-align-binding-forms
+   (quote
+    ("let" "when-let" "when-some" "if-let" "if-some" "binding" "loop" "doseq" "for" "with-open" "with-local-vars" "with-redefs" "for-frag")))
+ '(clojure-docstring-fill-column 100)
+ '(clojure-indent-style (quote align-arguments))
  '(coffee-tab-width 2)
  '(comint-prompt-read-only t)
  '(company-backends
@@ -736,11 +781,12 @@
     ("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin")))
  '(exec-path-from-shell-variables
    (quote
-    ("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS")))
+    ("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS" "JAVA_HOME")))
  '(explicit-shell-file-name nil)
  '(eyebrowse-wrap-around t)
  '(flycheck-disabled-checkers (quote (html-tidy)))
  '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
+ '(flyspell-issue-message-flag nil)
  '(fringe-mode (quote (1 . 1)) nil (fringe))
  '(grep-find-ignored-directories
    (quote
@@ -775,6 +821,18 @@
  '(hl-fg-colors
    (quote
     ("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3")))
+ '(ibuffer-formats
+   (quote
+    ((mark modified read-only locked " "
+           (name 40 40 :left :elide)
+           " "
+           (size 9 -1 :right)
+           " "
+           (mode 16 16 :left :elide)
+           " " filename-and-process)
+     (mark " "
+           (name 16 -1)
+           " " filename))))
  '(ido-cr+-auto-update-blacklist t)
  '(inhibit-startup-screen t)
  '(ivy-height 20)
@@ -847,12 +905,19 @@
  '(pos-tip-foreground-color "#586e75")
  '(projectile-completion-system (quote ivy))
  '(projectile-enable-idle-timer nil)
+ '(projectile-indexing-method (quote hybrid))
  '(projectile-mode-line nil)
  '(projectile-tags-command "")
  '(projectile-use-git-grep t)
  '(safe-local-variable-values
    (quote
-    ((cider-default-cljs-repl . "figwheel")
+    ((cider-refresh-after-fn . "integrant.repl/resume")
+     (cider-refresh-before-fn . "integrant.repl/suspend")
+     (eval setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home")
+     (eval setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home")
+     (eval
+      (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home"))
+     (cider-default-cljs-repl . "figwheel")
      (cider-default-cljs-repl . figwheel)
      (cider-default-cljs-repl quote figwheel)
      (cider-default-cljs-repl . "Figwheel")
@@ -899,9 +964,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "Monaco"))))
- '(cider-deprecated-face ((t (:background "#432" :foreground "#ccc"))))
  '(cider-error-highlight-face ((t (:inherit nil :background "MistyRose1"))))
  '(cider-result-overlay-face ((t (:background "lightgreen" :box (:line-width -1 :color "black")))))
+ '(cider-test-failure-face ((t (:background "orange red" :foreground "white"))))
  '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
  '(company-tooltip ((t (:background "wheat2"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
