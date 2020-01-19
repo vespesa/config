@@ -201,7 +201,17 @@
 ;; (require 'ido-ubiquitous)
 ;; (ido-ubiquitous-mode 1)
 
+;; Resize default font
+
+(defun toggle-font-size ()
+  (interactive)
+  (set-face-attribute 'default nil
+                      :height (if (= (face-attribute 'default :height nil nil) 110)
+                                  130 110)))
+
 ;; Flycheck
+(require 'flycheck-clj-kondo)
+
 ;; (eval-after-load 'flycheck '(flycheck-clojure-setup))
 (add-hook 'after-init-hook #'global-flycheck-mode)
 ;; (eval-after-load 'flycheck
@@ -898,7 +908,7 @@
      ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term counsel-tramp counsel-projectile projectile-ripgrep git-gutter xterm-color easy-kill deft hl-line+ perspective beacon prodigy smex swiper counsel ivy projector smooth-scrolling smart-region better-shell clojure-mode company company-shell magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme ws-butler win-switch web-mode tagedit syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters project-explorer powerline popup pandoc-mode pandoc multiple-cursors mic-paren markdown-mode magit-gitflow inflections imenu-anywhere ido-ubiquitous hgignore-mode ggtags flycheck-pos-tip flx-ido exec-path-from-shell eval-sexp-fu dumb-jump company-web company-quickhelp color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
+    (flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term counsel-tramp counsel-projectile projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper counsel ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
