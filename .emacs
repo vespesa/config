@@ -218,6 +218,9 @@
 ;;   '(custom-set-variables
 ;;    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
+(with-eval-after-load 'flycheck
+  (flycheck-popup-tip-mode))
+
 ;; Company mode
 (add-hook 'after-init-hook 'global-company-mode)
 (company-quickhelp-mode 1)
@@ -795,7 +798,6 @@
  '(explicit-shell-file-name nil)
  '(eyebrowse-wrap-around t)
  '(flycheck-disabled-checkers (quote (html-tidy)))
- '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
  '(flyspell-issue-message-flag nil)
  '(fringe-mode (quote (1 . 1)) nil (fringe))
  '(grep-find-ignored-directories
@@ -904,11 +906,10 @@
  '(package-archives
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
-     ("Melpa" . "https://melpa.org/packages/")
-     ("Melpa Stable" . "https://stable.melpa.org/packages/"))))
+     ("Melpa" . "https://melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term counsel-tramp counsel-projectile projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper counsel ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
+    (docker flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term counsel-tramp counsel-projectile projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper counsel ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
