@@ -20,7 +20,7 @@
 (require 'saveplace)
 (setq-default save-place t)
 
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+;(global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-z") 'zap-up-to-char)
 
 ;(global-set-key (kbd "C-s") 'isearch-forward-regexp)
@@ -69,6 +69,7 @@
                              ;;(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
                              (local-set-key (kbd "C-l") 'comint-clear-buffer)
                              (local-set-key (kbd "C-c C-l") 'comint-clear-buffer)))
+
 
 (setq comint-output-filter-functions
       (remove 'ansi-color-process-output comint-output-filter-functions))
@@ -289,6 +290,7 @@
     (fact [1])
     (fact* [1])
     (facts [1])
+    (facts* [1])
     (for-frag [1])
     (pcond-> [1])
     (pcond->> [1]))
@@ -582,6 +584,7 @@
 ;; SCSS (Sass)
 ;;(require 'scss-mode)
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+(add-to-list 'auto-mode-alist '("\\.sass\\'" . sass-mode))
 ;;(add-hook 'sccs-mode-hook 'electric-pair-mode)
 
 ;; web-mode
@@ -719,7 +722,32 @@
 (global-set-key (kbd "s-o") 'hs-toggle-hiding)
 (global-set-key (kbd "s-t") 'hs-hide-all)
 (global-set-key (kbd "s-y") 'hs-show-all)
+
+;; https://stackoverflow.com/questions/944614/emacs-does-hideshow-work-with-xml-mode-sgml-mode
+;; Fix XML folding
+(add-to-list 'hs-special-modes-alist
+             (list 'nxml-mode
+                   "<!--\\|<[^/>]*[^/]>"
+                   "-->\\|</[^/>]*[^/]>"
+                   "<!--"
+                   'nxml-forward-element
+                   nil))
+
+;; Fix HTML folding
+(dolist (mode '(sgml-mode
+                html-mode))
+  (add-to-list 'hs-special-modes-alist
+               (list mode
+                     "<!--\\|<[^/>]*[^/]>"
+                     "-->\\|</[^/>]*[^/]>"
+                     "<!--"
+                     'sgml-skip-tag-forward
+                     nil)))
+
 (add-hook 'prog-mode-hook #'hs-minor-mode)
+(add-hook 'sgml-mode-hook #'hs-minor-mode)
+(add-hook 'nxml-mode-hook #'hs-minor-mode)
+(add-hook 'html-mode-hook #'hs-minor-mode)
 
 ;; SSH
 
@@ -909,7 +937,7 @@
      ("Melpa" . "https://melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (docker flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term counsel-tramp counsel-projectile projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper counsel ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
+    (counsel counsel-projectile php-mode sass-mode docker flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
