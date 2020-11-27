@@ -20,7 +20,8 @@
 (require 'saveplace)
 (setq-default save-place t)
 
-;(global-set-key (kbd "C-x C-b") 'ibuffer)
+;; (global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-unset-key (kbd "C-x C-b"))
 (global-set-key (kbd "M-z") 'zap-up-to-char)
 
 ;(global-set-key (kbd "C-s") 'isearch-forward-regexp)
@@ -87,8 +88,8 @@
           (lambda ()
             (setq xterm-color-preserve-properties t)))
 
-(add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
-(setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
+;(add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+;(setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
 
 (defun reverse-text (beg end)
  "Reverse characters between BEG and END."
@@ -554,6 +555,9 @@
 (setq sm/theme 'light)
 (sml/setup)
 
+;; Todotxt
+(global-set-key (kbd "C-c t") 'todotxt)
+
 ;; (require 'sunrise-commander)
 
 ;; Org
@@ -706,10 +710,16 @@
 
 ;; Perspective
 ;; Local since the package is broken in 26.1.
-(require 'perspective)
-(persp-mode t)
-(define-key persp-mode-map (kbd "C-s-<right>") 'persp-next)
-(define-key persp-mode-map (kbd "C-s-<left>") 'persp-prev)
+;; (require 'perspective)
+;; (persp-mode t)
+;; (define-key persp-mode-map (kbd "C-s-<right>") 'persp-next)
+;; (define-key persp-mode-map (kbd "C-s-<left>") 'persp-prev)
+
+(global-set-key (kbd "C-s-<right>") 'wconf-use-next)
+(global-set-key (kbd "C-s-<left>") 'wconf-use-previous)
+
+;; Initial (superfluous) wconf
+(wconf-create)
 
 (global-set-key (kbd "C--") 'flash-line-highlight)
 
@@ -773,97 +783,84 @@
  '(beacon-color "DarkOrange1")
  '(beacon-mode nil)
  '(blink-cursor-mode nil)
- '(c-basic-offset 2 t)
- '(calendar-today-visible-hook (quote (calendar-mark-today org-journal-mark-entries)) t)
+ '(c-basic-offset 2)
+ '(calendar-today-visible-hook '(calendar-mark-today org-journal-mark-entries) t)
  '(calendar-week-start-day 1)
- '(cider-pprint-fn (quote zprint))
- '(cider-print-fn (quote zprint))
+ '(cider-pprint-fn 'zprint)
+ '(cider-print-fn 'zprint)
  '(cider-prompt-for-symbol nil)
  '(cider-repl-display-in-current-window t)
  '(cider-repl-use-pretty-printing nil)
  '(clojure-align-binding-forms
-   (quote
-    ("let" "when-let" "when-some" "if-let" "if-some" "binding" "loop" "doseq" "for" "with-open" "with-local-vars" "with-redefs" "for-frag")))
- '(clojure-docstring-fill-column 100)
- '(clojure-indent-style (quote align-arguments))
+   '("let" "when-let" "when-some" "if-let" "if-some" "binding" "loop" "doseq" "for" "with-open" "with-local-vars" "with-redefs" "for-frag"))
+ '(clojure-docstring-fill-column 90)
+ '(clojure-indent-style 'align-arguments)
  '(coffee-tab-width 2)
  '(comint-prompt-read-only t)
  '(company-backends
-   (quote
-    (company-bbdb company-nxml company-css company-eclim company-semantic company-clang company-xcode company-cmake company-capf company-files
+   '(company-bbdb company-nxml company-css company-eclim company-semantic company-clang company-xcode company-cmake company-capf company-files
                   (company-dabbrev-code company-gtags company-etags company-keywords)
-                  company-oddmuse company-dabbrev)))
+                  company-oddmuse company-dabbrev))
  '(company-dabbrev-code-modes
-   (quote
-    (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode js2-mode scss-mode html-mode)))
+   '(prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode js2-mode scss-mode html-mode))
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
- '(compilation-message-face (quote default))
+ '(compilation-message-face 'default)
  '(css-indent-offset 2)
  '(cua-global-mark-cursor-color "#2aa198")
  '(cua-normal-cursor-color "#657b83")
  '(cua-overwrite-cursor-color "#b58900")
  '(cua-read-only-cursor-color "#859900")
- '(cursor-type (quote bar))
- '(custom-enabled-themes (quote (sanityinc-solarized-light)))
+ '(cursor-type 'bar)
+ '(custom-enabled-themes '(sanityinc-solarized-light))
  '(custom-safe-themes
-   (quote
-    ("ff9e6deb9cfc908381c1267f407b8830bcad6028231a5f736246b9fc65e92b44" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" "d1dbd38c2fef808a27bb411ecff76a0a8026856a16cb2a1fb8820bedeb45740a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default)))
+   '("ff9e6deb9cfc908381c1267f407b8830bcad6028231a5f736246b9fc65e92b44" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" "d1dbd38c2fef808a27bb411ecff76a0a8026856a16cb2a1fb8820bedeb45740a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default))
  '(custom-theme-load-path
-   (quote
-    ("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/" "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2" custom-theme-directory t)) t)
+   '("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/" "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2" custom-theme-directory t) t)
  '(deft-auto-save-interval 60.0)
- '(deft-extensions (quote ("md" "txt" "text" "markdown" "org")))
+ '(deft-extensions '("md" "txt" "text" "markdown" "org"))
  '(deft-markdown-mode-title-level 2)
  '(dired-dwim-target t)
- '(display-buffer-alist (quote (("\\*shell" display-buffer-same-window (nil)))))
+ '(display-buffer-alist '(("\\*shell" display-buffer-same-window (nil))))
  '(exec-path
-   (quote
-    ("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin")))
+   '("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin"))
  '(exec-path-from-shell-variables
-   (quote
-    ("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS" "JAVA_HOME")))
+   '("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS" "JAVA_HOME"))
  '(explicit-shell-file-name nil)
  '(eyebrowse-wrap-around t)
- '(flycheck-disabled-checkers (quote (html-tidy)))
+ '(flycheck-disabled-checkers '(html-tidy))
  '(flyspell-issue-message-flag nil)
- '(fringe-mode (quote (1 . 1)) nil (fringe))
+ '(fringe-mode '(1 . 1) nil (fringe))
  '(grep-find-ignored-directories
-   (quote
-    ("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "public")))
+   '("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "public"))
  '(helm-buffer-max-length nil)
  '(helm-lisp-fuzzy-completion t)
  '(helm-mode nil)
  '(helm-move-to-line-cycle-in-source t)
- '(helm-split-window-default-side (quote same))
+ '(helm-split-window-default-side 'same)
  '(helm-swoop-pre-input-function (lambda nil ""))
  '(helm-swoop-split-with-multiple-windows t)
- '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
+ '(highlight-changes-colors '("#d33682" "#6c71c4"))
  '(highlight-symbol-colors
    (--map
     (solarized-color-blend it "#fdf6e3" 0.25)
-    (quote
-     ("#b58900" "#2aa198" "#dc322f" "#6c71c4" "#859900" "#cb4b16" "#268bd2"))))
+    '("#b58900" "#2aa198" "#dc322f" "#6c71c4" "#859900" "#cb4b16" "#268bd2")))
  '(highlight-symbol-foreground-color "#586e75")
  '(highlight-tail-colors
-   (quote
-    (("#eee8d5" . 0)
+   '(("#eee8d5" . 0)
      ("#B4C342" . 20)
      ("#69CABF" . 30)
      ("#69B7F0" . 50)
      ("#DEB542" . 60)
      ("#F2804F" . 70)
      ("#F771AC" . 85)
-     ("#eee8d5" . 100))))
+     ("#eee8d5" . 100)))
  '(hl-bg-colors
-   (quote
-    ("#DEB542" "#F2804F" "#FF6E64" "#F771AC" "#9EA0E5" "#69B7F0" "#69CABF" "#B4C342")))
+   '("#DEB542" "#F2804F" "#FF6E64" "#F771AC" "#9EA0E5" "#69B7F0" "#69CABF" "#B4C342"))
  '(hl-fg-colors
-   (quote
-    ("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3")))
+   '("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3"))
  '(ibuffer-formats
-   (quote
-    ((mark modified read-only locked " "
+   '((mark modified read-only locked " "
            (name 40 40 :left :elide)
            " "
            (size 9 -1 :right)
@@ -872,9 +869,10 @@
            " " filename-and-process)
      (mark " "
            (name 16 -1)
-           " " filename))))
+           " " filename)))
  '(ido-cr+-auto-update-blacklist t)
  '(inhibit-startup-screen t)
+ '(initial-major-mode 'fundamental-mode)
  '(ivy-height 20)
  '(ivy-wrap t)
  '(js-indent-level 2)
@@ -908,16 +906,16 @@
  '(js3-strict-trailing-comma-warning nil)
  '(js3-strict-var-hides-function-arg-warning nil)
  '(js3-strict-var-redeclaration-warning nil)
- '(magit-display-buffer-function (quote magit-display-buffer-same-window-except-diff-v1))
+ '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
  '(magit-gitflow-hotfix-finish-arguments nil)
- '(magit-no-confirm (quote (stage-all-changes)))
+ '(magit-no-confirm '(stage-all-changes))
  '(magit-use-overlays nil)
- '(ns-function-modifier (quote hyper))
- '(org-agenda-files (quote ("~/org/" "~/Documents/journal/")))
- '(org-agenda-window-setup (quote other-window))
+ '(nrepl-sync-request-timeout 60)
+ '(ns-function-modifier 'hyper)
+ '(org-agenda-files '("~/org/" "~/Documents/journal/"))
+ '(org-agenda-window-setup 'other-window)
  '(org-capture-templates
-   (quote
-    (("t" "Todo" entry
+   '(("t" "Todo" entry
       (file "~/org/notes.org")
       "* TODO %?")
      ("j" "Journal entry" entry
@@ -925,32 +923,29 @@
       "* %?")
      ("n" "Note in plain text" plain
       (file "~/org/notes.txt")
-      ""))))
+      "")))
  '(org-default-notes-file "~/org/notes.org")
  '(org-journal-date-format "%A, %-e.%m.%Y")
  '(org-journal-hide-entries-p nil)
  '(org-startup-folded nil)
  '(org-support-shift-select t)
  '(package-archives
-   (quote
-    (("gnu" . "http://elpa.gnu.org/packages/")
-     ("Melpa" . "https://melpa.org/packages/"))))
+   '(("gnu" . "http://elpa.gnu.org/packages/")
+     ("Melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   (quote
-    (counsel counsel-projectile php-mode sass-mode docker flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure)))
+   '(todotxt copy-as-format wconf counsel counsel-projectile php-mode sass-mode docker flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
- '(projectile-completion-system (quote ivy))
+ '(projectile-completion-system 'ivy)
  '(projectile-enable-idle-timer nil)
- '(projectile-indexing-method (quote hybrid))
+ '(projectile-indexing-method 'hybrid)
  '(projectile-mode-line nil)
  '(projectile-tags-command "")
  '(projectile-use-git-grep t)
  '(safe-local-variable-values
-   (quote
-    ((cider-refresh-after-fn . "integrant.repl/resume")
+   '((cider-refresh-after-fn . "integrant.repl/resume")
      (cider-refresh-before-fn . "integrant.repl/suspend")
      (eval setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home")
      (eval setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home")
@@ -960,7 +955,7 @@
      (cider-default-cljs-repl . figwheel)
      (cider-default-cljs-repl quote figwheel)
      (cider-default-cljs-repl . "Figwheel")
-     (encoding . utf-8))))
+     (encoding . utf-8)))
  '(scss-compile-at-save nil)
  '(show-paren-mode nil)
  '(show-smartparens-global-mode t)
@@ -969,19 +964,18 @@
  '(sml/no-confirm-load-theme nil)
  '(solarized-broken-srgb t)
  '(sp-hybrid-kill-excessive-whitespace nil)
- '(sp-ignore-modes-list (quote (minibuffer-inactive-mode html-mode robot-mode)))
+ '(sp-ignore-modes-list '(minibuffer-inactive-mode html-mode robot-mode))
  '(sp-navigate-close-if-unbalanced t)
- '(sp-no-reindent-after-kill-modes (quote (coffee-mode js2-mode js3-mode robot-mode)))
- '(sp-sexp-prefix (quote ((emacs-lisp-mode regexp "\\(?:,@\\|[',`]\\)"))))
+ '(sp-no-reindent-after-kill-modes '(coffee-mode js2-mode js3-mode robot-mode))
+ '(sp-sexp-prefix '((emacs-lisp-mode regexp "\\(?:,@\\|[',`]\\)")))
  '(sp-sexp-suffix
-   (quote
-    ((inferior-python-mode regexp "")
+   '((inferior-python-mode regexp "")
      (python-mode regexp "")
      (js3-mode regexp "")
      (js2-mode regexp "")
      (ruby-mode syntax "")
      (robot-mode regexp "")
-     (scss-mode regexp ""))))
+     (scss-mode regexp "")))
  '(speedbar-hide-button-brackets-flag t)
  '(speedbar-show-unknown-files t)
  '(speedbar-use-images nil)
@@ -995,8 +989,7 @@
  '(web-mode-code-indent-offset 2)
  '(web-mode-enable-current-column-highlight t)
  '(weechat-color-list
-   (quote
-    (unspecified "#fdf6e3" "#eee8d5" "#990A1B" "#dc322f" "#546E00" "#859900" "#7B6000" "#b58900" "#00629D" "#268bd2" "#93115C" "#d33682" "#00736F" "#2aa198" "#657b83" "#839496"))))
+   '(unspecified "#fdf6e3" "#eee8d5" "#990A1B" "#dc322f" "#546E00" "#859900" "#7B6000" "#b58900" "#00629D" "#268bd2" "#93115C" "#d33682" "#00736F" "#2aa198" "#657b83" "#839496")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
