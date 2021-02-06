@@ -37,6 +37,9 @@
                               (switch-to-buffer-other-window "*eshell*" )))
 (global-set-key [remap kill-ring-save] 'easy-kill)
 
+(require 'undo-tree)
+(global-undo-tree-mode)
+
 (defun eshell/old-clear ()
   "Clear the eshell buffer."
   (let ((inhibit-read-only t))
@@ -933,7 +936,7 @@
    '(("gnu" . "http://elpa.gnu.org/packages/")
      ("Melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(todotxt copy-as-format wconf counsel counsel-projectile php-mode sass-mode docker flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure))
+   '(undo-tree todotxt copy-as-format wconf counsel counsel-projectile php-mode sass-mode docker flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
