@@ -1,5 +1,8 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
+(setq default-directory "~/")
+(setq command-line-default-directory "~/")
+
 ;; From better defaults. For some reason the package version did not work.
 (ido-mode t)
 (setq ido-enable-flex-matching t)
@@ -936,7 +939,7 @@
    '(("gnu" . "http://elpa.gnu.org/packages/")
      ("Melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(undo-tree todotxt copy-as-format wconf counsel counsel-projectile php-mode sass-mode docker flycheck-popup-tip flycheck-clj-kondo defproject cider ssh yaml-mode groovy-mode make-color deadgrep iedit tramp-term projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 zenburn-theme web-mode syslog-mode sunrise-commander solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window 4clojure))
+   '(undo-tree todotxt copy-as-format wconf counsel counsel-projectile php-mode sass-mode docker flycheck-popup-tip flycheck-clj-kondo defproject cider yaml-mode groovy-mode make-color deadgrep iedit tramp-term projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper ivy projector better-shell clojure-mode company magit paradox python-mode smartparens tern ac-js2 xref-js2 web-mode syslog-mode solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
