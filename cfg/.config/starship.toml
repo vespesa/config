@@ -9,8 +9,17 @@ style = "bold blue"
 [git_branch]
 style = "bold green"
 
+[git_state]
+disabled = true
+
+[git_status]
+disabled = true
+
 [java]
 disabled = true
 
 [nodejs]
+disabled = true
+
+[python]
 disabled = true
