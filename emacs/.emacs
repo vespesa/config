@@ -1,4 +1,4 @@
-;; Bootstrat straight.el
+;; Bootstrap straight.el
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -26,6 +26,7 @@
 (straight-use-package 'color-identifiers-mode)
 (straight-use-package 'color-theme-sanityinc-solarized)
 (straight-use-package 'company)
+(straight-use-package 'company-quickhelp)
 (straight-use-package 'copy-as-format)
 (straight-use-package 'counsel)
 (straight-use-package 'counsel-projectile)
@@ -46,20 +47,27 @@
 (straight-use-package 'iedit)
 (straight-use-package 'imenu-anywhere)
 (straight-use-package 'ivy)
+(straight-use-package 'prescient)
+(straight-use-package 'ivy-prescient)
+(straight-use-package 'company-prescient)
 (straight-use-package 'magit)
+(straight-use-package 'magit-gitflow)
 (straight-use-package 'make-color)
 (straight-use-package 'markdown-mode)
+(straight-use-package 'mic-paren)
 (straight-use-package 'multiple-cursors)
 (straight-use-package 'pandoc-mode)
 (straight-use-package 'php-mode)
 (straight-use-package 'powerline)
 (straight-use-package 'prodigy)
+;;(straight-use-package 'project-explorer)
 (straight-use-package 'projectile-ripgrep)
 (straight-use-package 'python-mode)
 (straight-use-package 'rainbow-delimiters)
 (straight-use-package 'sass-mode)
 (straight-use-package 'smart-mode-line)
 (straight-use-package 'smartparens)
+(straight-use-package 'smooth-scrolling)
 (straight-use-package 'solarized-theme)
 (straight-use-package 'swiper)
 (straight-use-package 'syslog-mode)
@@ -67,6 +75,7 @@
 (straight-use-package 'todotxt)
 (straight-use-package 'tramp-term)
 (straight-use-package 'undo-tree)
+(straight-use-package 'vterm)
 (straight-use-package 'wconf)
 (straight-use-package 'web-mode)
 (straight-use-package 'xref-js2)
@@ -407,10 +416,11 @@
 
 (defun java8 ()
   (interactive)
-  (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home"))
+  (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home"))
+
 (defun java11 ()
   (interactive)
-  (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home"))
+  (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home"))
 
 (defun java8-cider-jack-in ()
   (interactive)
@@ -462,7 +472,7 @@
 ;(setq magit-last-seen-setup-instructions "1.4.0")
 (global-set-key (kbd "C-x g") 'magit-status)
 
-(global-git-gutter-mode t)
+;(global-git-gutter-mode t)
 
 ;; Git-flow
 (require 'magit-gitflow)
@@ -524,17 +534,17 @@
 ;; (global-set-key (kbd "H-p") 'helm-projectile-find-file)
 (global-set-key (kbd "H-1") 'projectile-run-eshell)
 (global-set-key (kbd "H-2") 'projectile-run-shell)
-(global-set-key (kbd "H-3") 'projectile-run-term)
+(global-set-key (kbd "H-3") 'projectile-run-vterm)
 ;; (global-set-key (kbd "<f13>") 'helm-projectile-find-file)
 ;; (global-set-key (kbd "<f16>") 'helm-projectile-find-file)
 (global-set-key (kbd "C-<kp-7>") 'projectile-run-eshell)
 (global-set-key (kbd "C-<kp-8>") 'projectile-run-shell)
-(global-set-key (kbd "C-<kp-9>") 'projectile-run-term)
+(global-set-key (kbd "C-<kp-9>") 'projectile-run-vterm)
 
-(require 'project-explorer)
-(global-set-key (kbd "M-§")
-                (lambda () (interactive)
-                  (project-explorer-toggle)))
+;(require 'project-explorer)
+;(global-set-key (kbd "M-§")
+;                (lambda () (interactive)
+;                  (project-explorer-toggle)))
 
 ;; Counsel-projectile
 (global-set-key (kbd "s-s")
@@ -562,10 +572,10 @@
 (add-to-list 'auto-mode-alist '("\\.coffee\\'" . coffee-mode))
 
 ;; Markdown
-(require 'filladapt)
+;(require 'filladapt)
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 (add-hook 'markdown-mode-hook 'pandoc-mode)
-(add-hook 'markdown-mode-hook 'filladapt-mode)
+;(add-hook 'markdown-mode-hook 'filladapt-mode)
 (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
 
 ;; Remove trailing whitespace unobtrusively
@@ -772,16 +782,6 @@
 ;; dumb-jump
 ;;(dumb-jump-mode)
 
-;; Paradox package manager
-;; The contents of the paradox-token.el are simply
-;; (setq paradox-github-token "github personal tokem" )
-(load "paradox-token")
-
-;; Eyebrowse
-;; (eyebrowse-mode t)
-;; (define-key eyebrowse-mode-map (kbd "C-s-<right>") 'eyebrowse-next-window-config)
-;; (define-key eyebrowse-mode-map (kbd "C-s-<left>") 'eyebrowse-prev-window-config)
-
 (defun bjm/kill-this-buffer ()
   "Kill the current buffer."
   (interactive)
@@ -877,6 +877,7 @@
  '(clojure-docstring-fill-column 90)
  '(clojure-indent-style 'align-arguments)
  '(coffee-tab-width 2)
+ '(comint-process-echoes t)
  '(comint-prompt-read-only t)
  '(company-backends
    '(company-bbdb company-nxml company-css company-eclim company-semantic company-clang company-xcode company-cmake company-capf company-files
@@ -885,6 +886,7 @@
  '(company-dabbrev-code-modes
    '(prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode js2-mode scss-mode html-mode))
  '(company-idle-delay 0.2)
+ '(company-prescient-mode t)
  '(company-selection-wrap-around t)
  '(compilation-message-face 'default)
  '(css-indent-offset 2)
@@ -955,6 +957,7 @@
  '(inhibit-startup-screen t)
  '(initial-major-mode 'fundamental-mode)
  '(ivy-height 20)
+ '(ivy-prescient-mode t)
  '(ivy-wrap t)
  '(js-indent-level 2)
  '(js2-bounce-indent-p nil)
@@ -1019,6 +1022,7 @@
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
+ '(prescient-persist-mode t)
  '(projectile-completion-system 'ivy)
  '(projectile-enable-idle-timer nil)
  '(projectile-indexing-method 'hybrid)
