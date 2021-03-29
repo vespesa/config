@@ -4,10 +4,10 @@ add_newline = false
 disabled = true
 
 [directory]
-style = "bold blue"
+style = "bold #00008b"
 
 [git_branch]
-style = "bold green"
+style = "bold #228b22"
 
 [git_state]
 disabled = true
@@ -22,4 +22,7 @@ disabled = true
 disabled = true
 
 [python]
+disabled = true
+
+[ruby]
 disabled = true

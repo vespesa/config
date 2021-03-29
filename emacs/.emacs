@@ -41,6 +41,7 @@
 (straight-use-package 'flycheck-clj-kondo)
 (straight-use-package 'flycheck-popup-tip)
 (straight-use-package 'ggtags)
+(straight-use-package 'git-gutter)
 (straight-use-package 'groovy-mode)
 (straight-use-package 'hl-line+)
 ;(straight-use-package 'ido-ubiquitous)
@@ -71,11 +72,18 @@
 (straight-use-package 'solarized-theme)
 (straight-use-package 'swiper)
 (straight-use-package 'syslog-mode)
+(straight-use-package 'tagedit)
 (straight-use-package 'tern)
 (straight-use-package 'todotxt)
 (straight-use-package 'tramp-term)
 (straight-use-package 'undo-tree)
-(straight-use-package 'vterm)
+
+(use-package vterm
+  :straight t
+  :config (add-to-list 'vterm-eval-cmds
+                       '("update-pwd" (lambda (path)
+                                        (setq default-directory path)))))
+
 (straight-use-package 'wconf)
 (straight-use-package 'web-mode)
 (straight-use-package 'xref-js2)
@@ -258,7 +266,7 @@
 ;; Tweaking of installed packages
 ;(package-initialize)
 
-;; Make sure that the Emacs exec path is the same as Bash.
+;; Make sure that the Emacs exec path is the same as shell.
 (when (memq window-system '(mac ns))
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
@@ -385,7 +393,7 @@
     (for-frag [1])
     (pcond-> [1])
     (pcond->> [1]))
-  (set-fill-column 110)
+  (set-fill-column 90)
   (setq clojure-align-separator "---"))
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
@@ -472,7 +480,7 @@
 ;(setq magit-last-seen-setup-instructions "1.4.0")
 (global-set-key (kbd "C-x g") 'magit-status)
 
-;(global-git-gutter-mode t)
+(global-git-gutter-mode t)
 
 ;; Git-flow
 (require 'magit-gitflow)
@@ -700,7 +708,7 @@
 (add-hook 'html-mode-hook (lambda ()
                             (require 'hl-tags-mode)
                             (hl-tags-mode 1)
-                            (require 'tagedit)
+                            ;;(require 'tagedit)
                             (tagedit-mode 1)
                             (tagedit-add-experimental-features)
                             (define-key html-mode-map (kbd "C-<right>") 'tagedit-forward-slurp-tag)
@@ -1030,7 +1038,16 @@
  '(projectile-tags-command "")
  '(projectile-use-git-grep t)
  '(safe-local-variable-values
-   '((cider-refresh-after-fn . "integrant.repl/resume")
+   '((eval font-lock-add-keywords nil
+           `((,(concat "("
+                       (regexp-opt
+                        '("sp-do-move-op" "sp-do-move-cl" "sp-do-put-op" "sp-do-put-cl" "sp-do-del-op" "sp-do-del-cl")
+                        t)
+                       "\\_>")
+              1 'font-lock-variable-name-face)))
+     (cider-ns-refresh-after-fn . "integrant.repl/resume")
+     (cider-ns-refresh-before-fn . "integrant.repl/suspend")
+     (cider-refresh-after-fn . "integrant.repl/resume")
      (cider-refresh-before-fn . "integrant.repl/suspend")
      (eval setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home")
      (eval setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home")
@@ -1071,6 +1088,7 @@
  '(term-default-bg-color "#fdf6e3")
  '(term-default-fg-color "#657b83")
  '(tool-bar-mode nil)
+ '(vterm-always-compile-module t)
  '(web-mode-code-indent-offset 2)
  '(web-mode-enable-current-column-highlight t)
  '(weechat-color-list
