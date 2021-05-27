@@ -48,6 +48,12 @@
 (straight-use-package 'iedit)
 (straight-use-package 'imenu-anywhere)
 (straight-use-package 'ivy)
+(use-package ivy-rich
+  :straight t
+  :hook (ivy-mode . ivy-rich-mode)
+  :config
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+  (ivy-rich-mode t))
 (straight-use-package 'prescient)
 (straight-use-package 'ivy-prescient)
 (straight-use-package 'company-prescient)
@@ -85,7 +91,18 @@
                                         (setq default-directory path)))))
 
 (straight-use-package 'wconf)
-(straight-use-package 'web-mode)
+
+(use-package web-mode
+  :straight t
+  :mode ("\\.djhtml\\'" . web-mode)
+  :bind (:map web-mode-map
+              ("s-o" . web-mode-fold-or-unfold))
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-enable-auto-pairing nil))
+
 (straight-use-package 'xref-js2)
 (straight-use-package 'xterm-color)
 (straight-use-package 'yaml-mode)
@@ -288,6 +305,7 @@
 (global-set-key (kbd "C-s") 'swiper)
 (global-set-key (kbd "M-x") 'counsel-M-x)
 (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+(global-set-key (kbd "C-x r b") 'counsel-bookmark)
 
 ; Slim down ivy display
 ;; (setq ivy-count-format ""
@@ -362,6 +380,12 @@
 (sp-pair "(" ")" :wrap "M-(")
 (sp-pair "[" "]" :wrap "M-[")
 (sp-pair "{" "}" :wrap "M-{")
+
+(sp-local-pair 'web-mode "%" "%" :wrap "C-%")
+(sp-local-pair 'web-mode "<" ">" :wrap "C->")
+
+;; (sp-local-pair 'web-mode "<" nil :actions nil)
+;; (sp-local-pair 'web-mode "{" nil :actions nil)
 
 ;; sp-kill-hybrid-sexp does not work in text-mode.
 (add-to-list 'auto-mode-alist '(".*/i18n/.*\\.txt" . fundamental-mode))
@@ -698,9 +722,11 @@
 ;;       '(("knockoutjs"    . "\\.html\\'")))
 
 ;; (add-hook 'web-mode-hook (lambda ()
-;;                            (require 'company-web-html)
-;;                            (local-set-key (kbd "C-M-n") 'sp-html-next-tag)
-;;                            (local-set-key (kbd "C-M-p") 'sp-html-previous-tag)))
+;;                            ;;(require 'company-web-html)
+;;                            (smartparens-mode 0)
+;;                            ;;(local-set-key (kbd "C-M-n") 'sp-html-next-tag)
+;;                            ;;(local-set-key (kbd "C-M-p") 'sp-html-previous-tag)
+;;                            ))
 
 
 ;; HTML: Tagedit, hl-tags
@@ -708,7 +734,7 @@
 (add-hook 'html-mode-hook (lambda ()
                             (require 'hl-tags-mode)
                             (hl-tags-mode 1)
-                            ;;(require 'tagedit)
+                            (require 'tagedit)
                             (tagedit-mode 1)
                             (tagedit-add-experimental-features)
                             (define-key html-mode-map (kbd "C-<right>") 'tagedit-forward-slurp-tag)
@@ -966,6 +992,7 @@
  '(initial-major-mode 'fundamental-mode)
  '(ivy-height 20)
  '(ivy-prescient-mode t)
+ '(ivy-rich-path-style '## nil nil "Customized with use-package ivy-rich")
  '(ivy-wrap t)
  '(js-indent-level 2)
  '(js2-bounce-indent-p nil)
