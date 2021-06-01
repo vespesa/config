@@ -103,7 +103,11 @@
   (web-mode-code-indent-offset 2)
   (web-mode-enable-auto-pairing nil))
 
-(straight-use-package 'xref-js2)
+(use-package xref-js2
+  :straight t
+  :config
+  (setq xref-js2-search-program 'rg))
+
 (straight-use-package 'xterm-color)
 (straight-use-package 'yaml-mode)
 
