@@ -88,7 +88,8 @@
   :straight t
   :config (add-to-list 'vterm-eval-cmds
                        '("update-pwd" (lambda (path)
-                                        (setq default-directory path)))))
+                                        (setq default-directory path))))
+  :custom (vterm-clear-scrollback-when-clearing t))
 
 (straight-use-package 'wconf)
 
@@ -905,6 +906,7 @@
  '(c-basic-offset 2)
  '(calendar-today-visible-hook '(calendar-mark-today org-journal-mark-entries) t)
  '(calendar-week-start-day 1)
+ '(cider-offer-to-open-cljs-app-in-browser nil)
  '(cider-pprint-fn 'zprint)
  '(cider-print-fn 'zprint)
  '(cider-prompt-for-symbol nil)
@@ -1069,7 +1071,12 @@
  '(projectile-tags-command "")
  '(projectile-use-git-grep t)
  '(safe-local-variable-values
-   '((eval font-lock-add-keywords nil
+   '((cider-shadow-watched-builds ":front")
+     (cider-shadow-default-options . ":front")
+     (cider-default-cljs-repl . shadow)
+     (cider-default-clj-repl . lein)
+     (cider-default-cljs-repl . shadow-cljs)
+     (eval font-lock-add-keywords nil
            `((,(concat "("
                        (regexp-opt
                         '("sp-do-move-op" "sp-do-move-cl" "sp-do-put-op" "sp-do-put-cl" "sp-do-del-op" "sp-do-del-cl")
@@ -1154,6 +1161,7 @@
  '(mode-line ((t (:background "papaya whip" :foreground "black" :box (:line-width 1 :color "#657b83") :weight normal))))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
  '(region ((t (:background "light cyan" :inverse-video nil))))
+ '(vterm-color-white ((t (:background "DarkOrange1" :foreground "DarkOrange1"))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
  '(web-mode-current-column-highlight-face ((t (:background "bisque")))))
 (put 'erase-buffer 'disabled nil)
