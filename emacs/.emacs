@@ -28,6 +28,7 @@
 (straight-use-package 'company)
 (straight-use-package 'company-quickhelp)
 (straight-use-package 'copy-as-format)
+(straight-use-package 'project)
 (straight-use-package 'counsel)
 (straight-use-package 'counsel-projectile)
 (straight-use-package 'deadgrep)
@@ -82,7 +83,26 @@
 (straight-use-package 'tern)
 (straight-use-package 'todotxt)
 (straight-use-package 'tramp-term)
-(straight-use-package 'undo-tree)
+;;(straight-use-package 'undo-tree)
+
+;; (use-package eglot
+;;   :straight t
+;;   :hook (clojure-mode . eglot-ensure)
+;;   :custom
+;;   (eglot-connect-timeout 300))
+
+
+;; (use-package lsp-mode
+;;   :straight t
+;;   :init
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   :hook ((prog-mode . lsp))
+;;   :commands lsp)
+
+;; (use-package lsp-ivy
+;;   :straight t
+;;   :commands lsp-ivy-workspace-symbol)
+
 
 (use-package vterm
   :straight t
@@ -154,8 +174,8 @@
                               (switch-to-buffer-other-window "*eshell*" )))
 (global-set-key [remap kill-ring-save] 'easy-kill)
 
-(require 'undo-tree)
-(global-undo-tree-mode)
+;;(require 'undo-tree)
+;;(global-undo-tree-mode)
 
 (defun eshell/old-clear ()
   "Clear the eshell buffer."
@@ -906,6 +926,7 @@
  '(c-basic-offset 2)
  '(calendar-today-visible-hook '(calendar-mark-today org-journal-mark-entries) t)
  '(calendar-week-start-day 1)
+ '(cider-enrich-classpath nil)
  '(cider-offer-to-open-cljs-app-in-browser nil)
  '(cider-pprint-fn 'zprint)
  '(cider-print-fn 'zprint)
@@ -1035,6 +1056,7 @@
  '(magit-gitflow-hotfix-finish-arguments nil)
  '(magit-no-confirm '(stage-all-changes))
  '(magit-use-overlays nil)
+ '(manual-program "gman")
  '(nrepl-sync-request-timeout 60)
  '(ns-function-modifier 'hyper)
  '(org-agenda-files '("~/org/" "~/Documents/journal/"))
@@ -1070,10 +1092,14 @@
  '(projectile-mode-line nil)
  '(projectile-tags-command "")
  '(projectile-use-git-grep t)
+ '(python-shell-interpreter "python3")
  '(safe-local-variable-values
-   '((cider-shadow-watched-builds ":front")
+   '((cider-default-cljs-repl . shadow)
+     (cider-lein-parameters . "with-profile +shadow repl :headless")
+     (cider-offer-to-open-cljs-app-in-browser)
+     (cider-default-cljs-repl . custom)
+     (cider-shadow-watched-builds ":front")
      (cider-shadow-default-options . ":front")
-     (cider-default-cljs-repl . shadow)
      (cider-default-clj-repl . lein)
      (cider-default-cljs-repl . shadow-cljs)
      (eval font-lock-add-keywords nil
