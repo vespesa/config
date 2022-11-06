@@ -26,3 +26,6 @@ disabled = true
 
 [ruby]
 disabled = true
+
+[gcloud]
+format = "(on $symbol[$account@$domain]($style))"

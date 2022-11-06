@@ -1,4 +1,5 @@
 ;; Bootstrap straight.el
+(setq straight-repository-branch "develop")
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -58,6 +59,11 @@
 (straight-use-package 'prescient)
 (straight-use-package 'ivy-prescient)
 (straight-use-package 'company-prescient)
+(use-package ivy-xref
+  :straight t
+  :config
+  (setq xref-show-definitions-function #'ivy-xref-show-defs)
+  (setq xref-show-xrefs-function #'ivy-xref-show-defs))
 (straight-use-package 'magit)
 (straight-use-package 'magit-gitflow)
 (straight-use-package 'make-color)
@@ -83,6 +89,8 @@
 (straight-use-package 'tern)
 (straight-use-package 'todotxt)
 (straight-use-package 'tramp-term)
+(straight-use-package 'ansible-vault)
+
 ;;(straight-use-package 'undo-tree)
 
 ;; (use-package eglot
@@ -173,6 +181,7 @@
                               (display-buffer "*eshell*" nil nil)
                               (switch-to-buffer-other-window "*eshell*" )))
 (global-set-key [remap kill-ring-save] 'easy-kill)
+(global-set-key (kbd "C-M-.") 'xref-find-definitions-other-window)
 
 ;;(require 'undo-tree)
 ;;(global-undo-tree-mode)
@@ -371,9 +380,9 @@
 
 ;; Flyspell
 
-(require 'flyspell-lazy)
+;; (require 'flyspell-lazy)
 
-(flyspell-lazy-mode 1)
+;; (flyspell-lazy-mode 1)
 
 ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
@@ -433,7 +442,6 @@
   ;; (require 'cljr-helm)
   ;; (define-key clojure-mode-map (kbd "C-c r") 'cljr-helm)
   (define-key clojure-mode-map (kbd "C-c C-a") 'clojure-align)
-  (define-key clojure-mode-map (kbd "C-c h") 'clojure-cheatsheet)
   (define-clojure-indent
     (fact [1])
     (fact* [1])
@@ -443,7 +451,9 @@
     (pcond-> [1])
     (pcond->> [1]))
   (set-fill-column 90)
-  (setq clojure-align-separator "---"))
+  ;;(setq clojure-align-separator "---")
+
+  )
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 
@@ -454,6 +464,7 @@
 (setq nrepl-hide-special-buffers nil)
 
 (setq cider-show-error-buffer nil)
+(setq cider-merge-sessions 'host)
 (setq nrepl-log-messages nil)
 
 (add-hook 'cider-mode-hook
