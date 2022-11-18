@@ -121,9 +121,10 @@
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic)
+  (setq completion-styles '(orderless basic partial-completion)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
+
 
 ;; Configure directory extension. Part of Vertico.
 (use-package vertico-directory
@@ -223,8 +224,8 @@
 
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
+  (setq consult-preview-key 'any)
+  ;;(setq consult-preview-key (kbd "<right>"))
   ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
