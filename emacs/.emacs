@@ -34,6 +34,7 @@
 (straight-use-package 'project)
 ;; (straight-use-package 'counsel)
 ;; (straight-use-package 'counsel-projectile)
+;;(straight-use-package 'dash)
 (straight-use-package 'deadgrep)
 (straight-use-package 'defproject)
 (straight-use-package 'deft)
@@ -46,6 +47,11 @@
 (straight-use-package 'flycheck-popup-tip)
 (straight-use-package 'ggtags)
 (straight-use-package 'git-gutter)
+
+(use-package git-link
+  :straight t
+  :custom (git-link-default-branch "develop"))
+
 (straight-use-package 'groovy-mode)
 (straight-use-package 'hl-line+)
 ;(straight-use-package 'ido-ubiquitous)
@@ -94,6 +100,8 @@
 (straight-use-package 'todotxt)
 (straight-use-package 'tramp-term)
 (straight-use-package 'ansible-vault)
+(straight-use-package 'yasnippet)
+
 
 (use-package vertico
   :straight t
@@ -385,18 +393,32 @@
 ;;(straight-use-package 'undo-tree)
 
 ;; (use-package eglot
-;;   :straight t
+;;   ;;:straight t
 ;;   :hook (clojure-mode . eglot-ensure)
 ;;   :custom
 ;;   (eglot-connect-timeout 300))
 
 
+
+
 ;; (use-package lsp-mode
 ;;   :straight t
 ;;   :init
+;;   ;;  (setq lsp-use-plists t)
 ;;   (setq lsp-keymap-prefix "C-c l")
-;;   :hook ((prog-mode . lsp))
+;;   (setq lsp-completion-provider :none)
+;;   (setq gc-cons-threshold 100000000)
+;;   (setq read-process-output-max (* 1024 1024)) ;; 1mb
+;;   (setq lsp-idle-delay 0.500)
+;;   :hook ((clojure-mode . lsp)
+;;          (clojurescript-mode . lsp)
+;;          (js2-mode . lsp))
 ;;   :commands lsp)
+
+;; (defun corfu-lsp-setup ()
+;;   (setq-local completion-styles '(orderless)
+;;               completion-category-defaults nil))
+;; (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
 
 ;; (use-package lsp-ivy
 ;;   :straight t
@@ -430,6 +452,14 @@
 
 (straight-use-package 'xterm-color)
 (straight-use-package 'yaml-mode)
+
+(use-package all-the-icons
+  :straight t
+  :if (display-graphic-p))
+
+(use-package all-the-icons-dired
+  :straight t
+  :hook (dired-mode . all-the-icons-dired-mode))
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
@@ -1120,27 +1150,19 @@
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
 (defun my-js ()
-  (tern-mode t)
-  (define-key tern-mode-keymap (kbd "M-.") nil)
-  (define-key tern-mode-keymap (kbd "M-,") nil)
-  (local-unset-key (kbd "C-c C-s"))
-  (local-unset-key (kbd "M-."))
-  ;; xref-js2
-  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)
-  ;; Ctags
-  ;; Tern
-  ;;(local-set-minor-mode-key 'ggtags-mode-map (kbd "M-.") 'tern-find-definition)
+  ;; (tern-mode t)
+  ;; (define-key tern-mode-keymap (kbd "M-.") nil)
+  ;; (define-key tern-mode-keymap (kbd "M-,") nil)
+  ;; (local-unset-key (kbd "C-c C-s"))
+  ;; (local-unset-key (kbd "M-."))
+
+  ;; ;; xref-js2
+  ;; (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)
+
   (local-set-minor-mode-key 'smartparens-mode-map (kbd "C-<right>") 'sp-slurp-hybrid-sexp)
   (local-set-minor-mode-key 'js-mode-map (kbd "s-o") 'js2-mode-toggle-element))
 
 (add-hook 'js2-mode-hook 'my-js )
-;; (add-to-list 'company-backends 'company-tern)
-
-;; TAGS
-;; I never got the global/projectile work properly so let's just use ctags.
-;; (global-set-key (kbd "M-.") 'helm-etags-select)
-;; (global-set-key (kbd "M-,") 'pop-tag-mark)
-
 
 ;; Robot mode
 (load "robot-mode")
@@ -1230,6 +1252,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(all-the-icons-dired-monochrome nil)
  '(auto-revert-check-vc-info nil)
  '(auto-revert-interval 2)
  '(avy-all-windows nil)
@@ -1281,10 +1304,11 @@
  '(deft-markdown-mode-title-level 2)
  '(dired-dwim-target t)
  '(display-buffer-alist '(("\\*shell" display-buffer-same-window (nil))))
+ '(eglot-confirm-server-initiated-edits nil)
  '(exec-path
    '("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin"))
  '(exec-path-from-shell-variables
-   '("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS" "JAVA_HOME"))
+   '("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS" "JAVA_HOME" "LSP_USE_PLISTS"))
  '(explicit-shell-file-name nil)
  '(eyebrowse-wrap-around t)
  '(flycheck-disabled-checkers '(html-tidy))
@@ -1367,6 +1391,10 @@
  '(js3-strict-trailing-comma-warning nil)
  '(js3-strict-var-hides-function-arg-warning nil)
  '(js3-strict-var-redeclaration-warning nil)
+ '(lsp-auto-guess-root t)
+ '(lsp-enable-snippet nil)
+ '(lsp-headerline-breadcrumb-enable nil)
+ '(lsp-lens-enable nil)
  '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
  '(magit-gitflow-hotfix-finish-arguments nil)
  '(magit-no-confirm '(stage-all-changes))
@@ -1484,7 +1512,7 @@
  '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
  '(company-tooltip ((t (:background "wheat2"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
- '(flycheck-error ((t (:background "misty rose" :underline nil))))
+ '(flycheck-error ((t (:background "misty rose" :foreground "gray40" :underline nil))))
  '(flycheck-warning ((t (:background "LightGoldenrod1" :underline nil))))
  '(fringe ((t (:background "#fdf6e3"))))
  '(git-gutter:added ((t (:foreground "light green" :weight bold))))
@@ -1499,9 +1527,13 @@
  '(ivy-modified-buffer ((t (:foreground "firebrick"))))
  '(ivy-virtual ((t nil)))
  '(lazy-highlight ((t (:background "paleturquoise2"))))
+ '(lsp-flycheck-info-unnecessary-face ((t (:background "gray92" :foreground "gray40" :underline (:color "#2aa198" :style wave :position wave)))) t)
+ '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "gray40" :underline nil))) t)
  '(mode-line ((t (:background "papaya whip" :foreground "black" :box (:line-width 1 :color "#657b83") :weight normal))))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
  '(region ((t (:background "light cyan" :inverse-video nil))))
+ '(secondary-selection ((t (:extend t :background "LightBlue1"))))
+ '(vertico-current ((t (:extend t :background "LightBlue1"))))
  '(vterm-color-white ((t (:background "DarkOrange1" :foreground "DarkOrange1"))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
  '(web-mode-current-column-highlight-face ((t (:background "bisque")))))
