@@ -1,19 +1,21 @@
 ;; -*- lexical-binding: t -*-
 
 ;; Bootstrap straight.el
-(setq straight-repository-branch "develop")
+;;(setq straight-repository-branch "develop")
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
+      (bootstrap-version 6))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
          'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+
 
 (straight-use-package 'use-package)
 (straight-use-package 'ac-js2)
@@ -101,7 +103,6 @@
 (straight-use-package 'tramp-term)
 (straight-use-package 'ansible-vault)
 (straight-use-package 'yasnippet)
-
 
 (use-package vertico
   :straight t
@@ -394,35 +395,37 @@
 
 ;; (use-package eglot
 ;;   ;;:straight t
-;;   :hook (clojure-mode . eglot-ensure)
+;;   :hook ((clojure-mode . eglot-ensure)
+;;          (js2-mode . eglot-ensure))
 ;;   :custom
 ;;   (eglot-connect-timeout 300))
-
-
-
 
 ;; (use-package lsp-mode
 ;;   :straight t
 ;;   :init
-;;   ;;  (setq lsp-use-plists t)
+;;   (setq lsp-use-plists t)
 ;;   (setq lsp-keymap-prefix "C-c l")
 ;;   (setq lsp-completion-provider :none)
 ;;   (setq gc-cons-threshold 100000000)
 ;;   (setq read-process-output-max (* 1024 1024)) ;; 1mb
 ;;   (setq lsp-idle-delay 0.500)
+
 ;;   :hook ((clojure-mode . lsp)
 ;;          (clojurescript-mode . lsp)
 ;;          (js2-mode . lsp))
 ;;   :commands lsp)
 
-;; (defun corfu-lsp-setup ()
-;;   (setq-local completion-styles '(orderless)
-;;               completion-category-defaults nil))
-;; (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
+(defun lsp-force-faces ()
+  (interactive)
+  (custom-set-faces
+   '(lsp-flycheck-info-unnecessary-face ((t (:underline (:color "#2aa198" :style wave :position wave) :foreground "gray5"))) t)
+   '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "gray30" :underline nil))) t)))
 
-;; (use-package lsp-ivy
-;;   :straight t
-;;   :commands lsp-ivy-workspace-symbol)
+
+(defun corfu-lsp-setup ()
+  (setq-local completion-styles '(orderless)
+              completion-category-defaults nil))
+(add-hook 'lsp-mode-hook #'corfu-lsp-setup)
 
 
 (use-package vterm
@@ -702,6 +705,7 @@
 
 (with-eval-after-load 'flycheck
   (flycheck-popup-tip-mode))
+
 
 ;; Company mode
 ;; (add-hook 'after-init-hook 'global-company-mode)
@@ -1150,7 +1154,7 @@
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
 (defun my-js ()
-  ;; (tern-mode t)
+  (tern-mode t)
   ;; (define-key tern-mode-keymap (kbd "M-.") nil)
   ;; (define-key tern-mode-keymap (kbd "M-,") nil)
   ;; (local-unset-key (kbd "C-c C-s"))
@@ -1288,6 +1292,94 @@
  '(company-prescient-mode t)
  '(company-selection-wrap-around t)
  '(compilation-message-face 'default)
+ '(connection-local-criteria-alist
+   '(((:application eshell)
+      eshell-connection-default-profile)
+     ((:application tramp :protocol "flatpak")
+      tramp-container-connection-local-default-flatpak-profile)
+     ((:application tramp :machine "localhost")
+      tramp-connection-local-darwin-ps-profile)
+     ((:application tramp :machine "Ratina.local")
+      tramp-connection-local-darwin-ps-profile)
+     ((:application tramp)
+      tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)))
+ '(connection-local-profile-alist
+   '((eshell-connection-default-profile
+      (eshell-path-env-list))
+     (tramp-container-connection-local-default-flatpak-profile
+      (tramp-remote-path "/app/bin" tramp-default-remote-path "/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin" "/local/bin" "/local/freeware/bin" "/local/gnu/bin" "/usr/freeware/bin" "/usr/pkg/bin" "/usr/contrib/bin" "/opt/bin" "/opt/sbin" "/opt/local/bin"))
+     (tramp-connection-local-darwin-ps-profile
+      (tramp-process-attributes-ps-args "-acxww" "-o" "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state=abcde" "-o" "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (euid . number)
+       (user . string)
+       (egid . number)
+       (comm . 52)
+       (state . 5)
+       (ppid . number)
+       (pgrp . number)
+       (sess . number)
+       (ttname . string)
+       (tpgid . number)
+       (minflt . number)
+       (majflt . number)
+       (time . tramp-ps-time)
+       (pri . number)
+       (nice . number)
+       (vsize . number)
+       (rss . number)
+       (etime . tramp-ps-time)
+       (pcpu . number)
+       (pmem . number)
+       (args)))
+     (tramp-connection-local-busybox-ps-profile
+      (tramp-process-attributes-ps-args "-o" "pid,user,group,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "stat=abcde" "-o" "ppid,pgid,tty,time,nice,etime,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (user . string)
+       (group . string)
+       (comm . 52)
+       (state . 5)
+       (ppid . number)
+       (pgrp . number)
+       (ttname . string)
+       (time . tramp-ps-time)
+       (nice . number)
+       (etime . tramp-ps-time)
+       (args)))
+     (tramp-connection-local-bsd-ps-profile
+      (tramp-process-attributes-ps-args "-acxww" "-o" "pid,euid,user,egid,egroup,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state,ppid,pgid,sid,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etimes,pcpu,pmem,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (euid . number)
+       (user . string)
+       (egid . number)
+       (group . string)
+       (comm . 52)
+       (state . string)
+       (ppid . number)
+       (pgrp . number)
+       (sess . number)
+       (ttname . string)
+       (tpgid . number)
+       (minflt . number)
+       (majflt . number)
+       (time . tramp-ps-time)
+       (pri . number)
+       (nice . number)
+       (vsize . number)
+       (rss . number)
+       (etime . number)
+       (pcpu . number)
+       (pmem . number)
+       (args)))
+     (tramp-connection-local-default-shell-profile
+      (shell-file-name . "/bin/sh")
+      (shell-command-switch . "-c"))
+     (tramp-connection-local-default-system-profile
+      (path-separator . ":")
+      (null-device . "/dev/null"))))
  '(css-indent-offset 2)
  '(cua-global-mark-cursor-color "#2aa198")
  '(cua-normal-cursor-color "#657b83")
@@ -1305,6 +1397,7 @@
  '(dired-dwim-target t)
  '(display-buffer-alist '(("\\*shell" display-buffer-same-window (nil))))
  '(eglot-confirm-server-initiated-edits nil)
+ '(eldoc-echo-area-use-multiline-p nil)
  '(exec-path
    '("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin"))
  '(exec-path-from-shell-variables
@@ -1527,8 +1620,8 @@
  '(ivy-modified-buffer ((t (:foreground "firebrick"))))
  '(ivy-virtual ((t nil)))
  '(lazy-highlight ((t (:background "paleturquoise2"))))
- '(lsp-flycheck-info-unnecessary-face ((t (:background "gray92" :foreground "gray40" :underline (:color "#2aa198" :style wave :position wave)))) t)
- '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "gray40" :underline nil))) t)
+ '(lsp-flycheck-info-unnecessary-face ((t (:underline (:color "#2aa198" :style wave :position wave) :foreground "gray5"))) t)
+ '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "gray30" :underline nil))) t)
  '(mode-line ((t (:background "papaya whip" :foreground "black" :box (:line-width 1 :color "#657b83") :weight normal))))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
  '(region ((t (:background "light cyan" :inverse-video nil))))
