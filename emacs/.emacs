@@ -1,7 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
 ;; Bootstrap straight.el
-;;(setq straight-repository-branch "develop")
+(setq straight-repository-branch "develop")
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -101,8 +101,26 @@
 (straight-use-package 'tern)
 (straight-use-package 'todotxt)
 (straight-use-package 'tramp-term)
-(straight-use-package 'ansible-vault)
+;;(straight-use-package 'ansible-vault)
 (straight-use-package 'yasnippet)
+
+(use-package helpful
+  :straight t
+  :bind
+  (("C-h f" . helpful-callable)
+   ("C-h v" . helpful-variable)
+   ("C-h k" . helpful-key)
+   ("C-h x" . helpful-command)
+   ("C-c C-d" . helpful-at-point)
+   ("C-h F" . helpful-function)))
+
+(use-package ansible
+  :straight t
+  :custom
+  (ansible-vault-password-file "~/.vault-pass")
+  :hook
+  ((yaml-mode . (lambda () (ansible 1)))
+   (ansible . ansible-auto-decrypt-encrypt)))
 
 (use-package vertico
   :straight t
@@ -122,9 +140,7 @@
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   (setq vertico-cycle t)
   (setq completion-styles '(prescient basic))
-  (setq vertico-sort-function #'prescient-completion-sort)
-
-  )
+  (setq vertico-sort-function #'prescient-completion-sort))
 
 ;; Optionally use the `orderless' completion style.
 (use-package orderless
@@ -777,13 +793,13 @@
   ;; (define-key clojure-mode-map (kbd "C-c r") 'cljr-helm)
   (define-key clojure-mode-map (kbd "C-c C-a") 'clojure-align)
   (define-clojure-indent
-    (fact [1])
-    (fact* [1])
-    (facts [1])
-    (facts* [1])
-    (for-frag [1])
-    (pcond-> [1])
-    (pcond->> [1]))
+   (fact 1)
+   (fact* 1)
+   (facts 1)
+   (facts* 1)
+   (for-frag 1)
+   (pcond-> 1)
+   (pcond->> 1))
   (set-fill-column 90)
   ;;(setq clojure-align-separator "---")
 
@@ -800,6 +816,8 @@
 (setq cider-show-error-buffer nil)
 (setq cider-merge-sessions 'host)
 (setq nrepl-log-messages nil)
+
+(setq cider-dynamic-indentation nil)
 
 (add-hook 'cider-mode-hook
           (lambda ()
