@@ -33,6 +33,8 @@
 ;; (straight-use-package 'company)
 ;; (straight-use-package 'company-quickhelp)
 (straight-use-package 'copy-as-format)
+(straight-use-package 'csv-mode)
+
 (straight-use-package 'project)
 ;; (straight-use-package 'counsel)
 ;; (straight-use-package 'counsel-projectile)
@@ -90,6 +92,11 @@
 (straight-use-package 'projectile-ripgrep)
 (straight-use-package 'python-mode)
 (straight-use-package 'rainbow-delimiters)
+
+(use-package restclient
+  :straight t
+  :mode ("\\.rest\\'" . restclient-mode))
+
 (straight-use-package 'sass-mode)
 (straight-use-package 'smart-mode-line)
 (straight-use-package 'smartparens)
@@ -103,6 +110,8 @@
 (straight-use-package 'tramp-term)
 ;;(straight-use-package 'ansible-vault)
 (straight-use-package 'yasnippet)
+(straight-use-package 'logview)
+
 
 (use-package helpful
   :straight t
@@ -410,7 +419,7 @@
 ;;(straight-use-package 'undo-tree)
 
 ;; (use-package eglot
-;;   ;;:straight t
+;;   :straight t
 ;;   :hook ((clojure-mode . eglot-ensure)
 ;;          (js2-mode . eglot-ensure))
 ;;   :custom
@@ -443,13 +452,21 @@
               completion-category-defaults nil))
 (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
 
+(use-package emacs
+  :ensure nil
+  :straight nil
+  :demand t
+  :hook ((text-mode prog-mode) . glyphless-display-mode)
+  :config
+  (set-face-background 'glyphless-char "red"))
 
 (use-package vterm
   :straight t
   :config (add-to-list 'vterm-eval-cmds
                        '("update-pwd" (lambda (path)
                                         (setq default-directory path))))
-  :custom (vterm-clear-scrollback-when-clearing t))
+  :custom (vterm-clear-scrollback-when-clearing t)
+  :hook (vterm-mode . goto-address-mode))
 
 (straight-use-package 'wconf)
 
@@ -586,8 +603,10 @@
           (lambda ()
             (setq xterm-color-preserve-properties t)))
 
-;(add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
-;(setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
+
+(defun shell-command-on-buffer (command)
+  (interactive "sShell command on buffer: ")
+  (shell-command-on-region (point-min) (point-max) command t))
 
 (defun reverse-text (beg end)
  "Reverse characters between BEG and END."
@@ -799,10 +818,13 @@
    (facts* 1)
    (for-frag 1)
    (pcond-> 1)
-   (pcond->> 1))
+   (pcond->> 1)
+   (reg-event-db 1)
+   (reg-event-fx 1)
+   (reg-sub 1)
+   (reg-fx 1))
   (set-fill-column 90)
   ;;(setq clojure-align-separator "---")
-
   )
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
@@ -834,33 +856,33 @@
             (define-key cider-repl-mode-map (kbd "<S-return>") 'cider-repl-newline-and-indent)
             (define-key cider-repl-mode-map (kbd "s-*") 'cider-repl-toggle-pretty-printing)))
 
-(defun java8 ()
-  (interactive)
-  (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home"))
+;; (defun java8 ()
+;;   (interactive)
+;;   (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home"))
 
-(defun java11 ()
-  (interactive)
-  (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home"))
+;; (defun java11 ()
+;;   (interactive)
+;;   (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home"))
 
-(defun java8-cider-jack-in ()
-  (interactive)
-  (java8)
-  (cider-jack-in nil))
+;; (defun java8-cider-jack-in ()
+;;   (interactive)
+;;   (java8)
+;;   (cider-jack-in nil))
 
-(defun java8-cider-jack-in-clj&cljs ()
-  (interactive)
-  (java8)
-  (cider-jack-in-clj&cljs nil nil))
+;; (defun java8-cider-jack-in-clj&cljs ()
+;;   (interactive)
+;;   (java8)
+;;   (cider-jack-in-clj&cljs nil nil))
 
-(defun java11-cider-jack-in ()
-  (interactive)
-  (java11)
-  (cider-jack-in nil))
+;; (defun java11-cider-jack-in ()
+;;   (interactive)
+;;   (java11)
+;;   (cider-jack-in nil))
 
-(defun java11-cider-jack-in-clj&cljs ()
-  (interactive)
-  (java11)
-  (cider-jack-in-clj&cljs nil nil))
+;; (defun java11-cider-jack-in-clj&cljs ()
+;;   (interactive)
+;;   (java11)
+;;   (cider-jack-in-clj&cljs nil nil))
 
 
 ;; Figwheel + Cider
