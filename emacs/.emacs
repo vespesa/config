@@ -83,7 +83,7 @@
 (straight-use-package 'make-color)
 (straight-use-package 'markdown-mode)
 (straight-use-package 'mic-paren)
-(straight-use-package 'multiple-cursors)
+;;(straight-use-package 'multiple-cursors)
 (straight-use-package 'pandoc-mode)
 (straight-use-package 'php-mode)
 (straight-use-package 'powerline)
@@ -124,7 +124,7 @@
    ("C-h F" . helpful-function)))
 
 (use-package ansible
-  :straight t
+  :straight (ansible :type git :host github :repo "k1LoW/emacs-ansible")
   :custom
   (ansible-vault-password-file "~/.vault-pass")
   :hook
@@ -418,12 +418,15 @@
 
 ;;(straight-use-package 'undo-tree)
 
-;; (use-package eglot
-;;   :straight t
-;;   :hook ((clojure-mode . eglot-ensure)
-;;          (js2-mode . eglot-ensure))
-;;   :custom
-;;   (eglot-connect-timeout 300))
+(use-package eglot
+  :straight t
+  :hook ((clojure-mode . eglot-ensure)
+         (js2-mode . eglot-ensure))
+  :init
+  ;; Don't log every event for better performance
+  (fset #'jsonrpc--log-event #'ignore)
+  :custom
+  (eglot-connect-timeout 300))
 
 ;; (use-package lsp-mode
 ;;   :straight t
@@ -830,13 +833,14 @@
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 
 ;; Cider
+
 ;;(require 'cider-eldoc)
 (add-hook 'cider-mode-hook #'eldoc-mode)
 ;;(add-hook 'clojure-mode-hook 'cider-turn-on-eldoc-mode)
 (setq nrepl-hide-special-buffers nil)
 
 (setq cider-show-error-buffer nil)
-(setq cider-merge-sessions 'host)
+(setq cider-merge-sessions nil)
 (setq nrepl-log-messages nil)
 
 (setq cider-dynamic-indentation nil)
