@@ -1,0 +1,15 @@
+;; https://clojure-lsp.io/settings/
+{:document-formatting?       false
+ :document-range-formatting? false
+ :cljfmt                     {:indentation?        true
+                              :sort-ns-references? true
+                              :indents             {midje.sweet.facts [[:inner 0]]
+                                                    midje.sweet.fact  [[:inner 0]]}}
+ :clean                      {:automatically-after-ns-refactor true
+                              :ns-inner-blocks-indentation     :same-line
+                              :ns-import-classes-indentation   :same-line
+                              :sort                            {:ns             true
+                                                                :require        true
+                                                                :import         true
+                                                                :import-classes {:classes-per-line 3} ;; -1 for all in single line
+                                                                :refer          {:max-line-length 80}}}}
