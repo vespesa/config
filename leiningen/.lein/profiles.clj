@@ -1,13 +1,10 @@
-{:user {:dependencies [[im.chit/vinyasa "0.4.7"]
-                       [zprint "1.2.9"]]
-        :plugins      [[cider/cider-nrepl "LATEST"]]
-        :aliases      {"outdated" ["with-profile" "root-antq" "run" "-m" "antq.core" "--skip=pom" "--no-changes"]}
-        :injections
-        [(require '[vinyasa.inject :as inject])
-         (inject/in ;; the default injected namespace is `.`
-           clojure.core >
-           [clojure.pprint pprint]
-           [zprint.core zprint]
-           [zprint.core czprint])]}
- :root-antq    {:dependencies [[com.github.liquidz/antq "RELEASE"]
-                               [org.slf4j/slf4j-nop "RELEASE"]]}}
+{:user {:dependencies        [[com.github.vespesa/taplica "0.1.0"]]
+        :plugins             [[com.gfredericks/lein-shorthand "0.4.1"]]
+        :shorthand           {tap [taplica.core/tap>> taplica.core/tap!
+                                   taplica.core/values taplica.core/value
+                                   taplica.core/fvalue taplica.core/lvalue
+                                   taplica.core/pause taplica.core/stop
+                                   taplica.core/resume taplica.core/reset]}
+        :deploy-repositories [["clojars" {:url      "https://repo.clojars.org"
+                                          :username :env/clojars_username
+                                          :password :env/clojars_password}]]}}

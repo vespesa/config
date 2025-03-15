@@ -16,7 +16,6 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-
 (straight-use-package 'use-package)
 (straight-use-package 'ac-js2)
 (straight-use-package 'ace-window)
@@ -35,6 +34,8 @@
 (straight-use-package 'copy-as-format)
 (straight-use-package 'csv-mode)
 
+(use-package eldoc :straight (:type built-in))
+
 (straight-use-package 'project)
 ;; (straight-use-package 'counsel)
 ;; (straight-use-package 'counsel-projectile)
@@ -48,13 +49,10 @@
 (straight-use-package 'eval-sexp-fu)
 (straight-use-package 'exec-path-from-shell)
 (straight-use-package 'flycheck-clj-kondo)
-(straight-use-package 'flycheck-popup-tip)
+;;(straight-use-package 'flycheck-popup-tip)
+;;(straight-use-package 'flycheck-pos-tip)
 (straight-use-package 'ggtags)
 (straight-use-package 'git-gutter)
-
-(use-package git-link
-  :straight t
-  :custom (git-link-default-branch "develop"))
 
 (straight-use-package 'groovy-mode)
 (straight-use-package 'hl-line+)
@@ -112,6 +110,9 @@
 (straight-use-package 'yasnippet)
 (straight-use-package 'logview)
 
+(use-package git-link
+:straight t
+:custom (git-link-default-branch "develop"))
 
 (use-package helpful
   :straight t
@@ -158,7 +159,7 @@
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic partial-completion)
+  (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
 
@@ -690,8 +691,8 @@
 
 ;; Make sure that the Emacs exec path is the same as shell.
 (when (memq window-system '(mac ns))
-  (require 'exec-path-from-shell)
-  (exec-path-from-shell-initialize))
+ (require 'exec-path-from-shell)
+ (exec-path-from-shell-initialize))
 (add-hook 'after-init-hook 'exec-path-from-shell-initialize)
 
 ;; Helm
@@ -741,8 +742,11 @@
 ;;   '(custom-set-variables
 ;;    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
-(with-eval-after-load 'flycheck
-  (flycheck-popup-tip-mode))
+;; (with-eval-after-load 'flycheck
+;;   (flycheck-popup-tip-mode))
+
+;; (with-eval-after-load 'flycheck
+;;   (flycheck-pos-tip-mode))
 
 
 ;; Company mode
@@ -1312,33 +1316,40 @@
  '(c-basic-offset 2)
  '(calendar-today-visible-hook '(calendar-mark-today org-journal-mark-entries) t)
  '(calendar-week-start-day 1)
+ '(cider-download-java-sources t)
  '(cider-enrich-classpath nil)
  '(cider-offer-to-open-cljs-app-in-browser nil)
  '(cider-pprint-fn 'zprint)
- '(cider-print-fn 'zprint)
+ '(cider-print-fn 'fipp)
  '(cider-prompt-for-symbol nil)
  '(cider-repl-display-in-current-window t)
  '(cider-repl-use-pretty-printing nil)
  '(clojure-align-binding-forms
-   '("let" "when-let" "when-some" "if-let" "if-some" "binding" "loop" "doseq" "for" "with-open" "with-local-vars" "with-redefs" "for-frag"))
+   '("let" "when-let" "when-some" "if-let" "if-some" "binding" "loop"
+     "doseq" "for" "with-open" "with-local-vars" "with-redefs"
+     "for-frag"))
  '(clojure-docstring-fill-column 90)
  '(clojure-indent-style 'align-arguments)
  '(coffee-tab-width 2)
  '(comint-process-echoes t)
  '(comint-prompt-read-only t)
  '(company-backends
-   '(company-bbdb company-nxml company-css company-eclim company-semantic company-clang company-xcode company-cmake company-capf company-files
-                  (company-dabbrev-code company-gtags company-etags company-keywords)
+   '(company-bbdb company-nxml company-css company-eclim company-semantic
+                  company-clang company-xcode company-cmake
+                  company-capf company-files
+                  (company-dabbrev-code company-gtags company-etags
+                                        company-keywords)
                   company-oddmuse company-dabbrev))
  '(company-dabbrev-code-modes
-   '(prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode js3-mode js2-mode scss-mode html-mode))
+   '(prog-mode batch-file-mode csharp-mode css-mode erlang-mode
+               haskell-mode jde-mode lua-mode python-mode js3-mode
+               js2-mode scss-mode html-mode))
  '(company-idle-delay 0.2)
  '(company-prescient-mode t)
  '(company-selection-wrap-around t)
  '(compilation-message-face 'default)
  '(connection-local-criteria-alist
-   '(((:application eshell)
-      eshell-connection-default-profile)
+   '(((:application eshell) eshell-connection-default-profile)
      ((:application tramp :protocol "flatpak")
       tramp-container-connection-local-default-flatpak-profile)
      ((:application tramp :machine "localhost")
@@ -1346,84 +1357,87 @@
      ((:application tramp :machine "Ratina.local")
       tramp-connection-local-darwin-ps-profile)
      ((:application tramp)
-      tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)))
+      tramp-connection-local-default-system-profile
+      tramp-connection-local-default-shell-profile)))
  '(connection-local-profile-alist
-   '((eshell-connection-default-profile
-      (eshell-path-env-list))
+   '((eshell-connection-default-profile (eshell-path-env-list))
      (tramp-container-connection-local-default-flatpak-profile
-      (tramp-remote-path "/app/bin" tramp-default-remote-path "/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin" "/local/bin" "/local/freeware/bin" "/local/gnu/bin" "/usr/freeware/bin" "/usr/pkg/bin" "/usr/contrib/bin" "/opt/bin" "/opt/sbin" "/opt/local/bin"))
+      (tramp-remote-path "/app/bin" tramp-default-remote-path "/bin"
+                         "/usr/bin" "/sbin" "/usr/sbin"
+                         "/usr/local/bin" "/usr/local/sbin"
+                         "/local/bin" "/local/freeware/bin"
+                         "/local/gnu/bin" "/usr/freeware/bin"
+                         "/usr/pkg/bin" "/usr/contrib/bin" "/opt/bin"
+                         "/opt/sbin" "/opt/local/bin"))
      (tramp-connection-local-darwin-ps-profile
-      (tramp-process-attributes-ps-args "-acxww" "-o" "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state=abcde" "-o" "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
-      (tramp-process-attributes-ps-format
-       (pid . number)
-       (euid . number)
-       (user . string)
-       (egid . number)
-       (comm . 52)
-       (state . 5)
-       (ppid . number)
-       (pgrp . number)
-       (sess . number)
-       (ttname . string)
-       (tpgid . number)
-       (minflt . number)
-       (majflt . number)
-       (time . tramp-ps-time)
-       (pri . number)
-       (nice . number)
-       (vsize . number)
-       (rss . number)
-       (etime . tramp-ps-time)
-       (pcpu . number)
-       (pmem . number)
-       (args)))
+      (tramp-process-attributes-ps-args "-acxww" "-o"
+                                        "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                        "-o" "state=abcde" "-o"
+                                        "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
+      (tramp-process-attributes-ps-format (pid . number)
+                                          (euid . number)
+                                          (user . string)
+                                          (egid . number) (comm . 52)
+                                          (state . 5) (ppid . number)
+                                          (pgrp . number)
+                                          (sess . number)
+                                          (ttname . string)
+                                          (tpgid . number)
+                                          (minflt . number)
+                                          (majflt . number)
+                                          (time . tramp-ps-time)
+                                          (pri . number)
+                                          (nice . number)
+                                          (vsize . number)
+                                          (rss . number)
+                                          (etime . tramp-ps-time)
+                                          (pcpu . number)
+                                          (pmem . number) (args)))
      (tramp-connection-local-busybox-ps-profile
-      (tramp-process-attributes-ps-args "-o" "pid,user,group,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "stat=abcde" "-o" "ppid,pgid,tty,time,nice,etime,args")
-      (tramp-process-attributes-ps-format
-       (pid . number)
-       (user . string)
-       (group . string)
-       (comm . 52)
-       (state . 5)
-       (ppid . number)
-       (pgrp . number)
-       (ttname . string)
-       (time . tramp-ps-time)
-       (nice . number)
-       (etime . tramp-ps-time)
-       (args)))
+      (tramp-process-attributes-ps-args "-o"
+                                        "pid,user,group,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                        "-o" "stat=abcde" "-o"
+                                        "ppid,pgid,tty,time,nice,etime,args")
+      (tramp-process-attributes-ps-format (pid . number)
+                                          (user . string)
+                                          (group . string) (comm . 52)
+                                          (state . 5) (ppid . number)
+                                          (pgrp . number)
+                                          (ttname . string)
+                                          (time . tramp-ps-time)
+                                          (nice . number)
+                                          (etime . tramp-ps-time)
+                                          (args)))
      (tramp-connection-local-bsd-ps-profile
-      (tramp-process-attributes-ps-args "-acxww" "-o" "pid,euid,user,egid,egroup,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state,ppid,pgid,sid,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etimes,pcpu,pmem,args")
-      (tramp-process-attributes-ps-format
-       (pid . number)
-       (euid . number)
-       (user . string)
-       (egid . number)
-       (group . string)
-       (comm . 52)
-       (state . string)
-       (ppid . number)
-       (pgrp . number)
-       (sess . number)
-       (ttname . string)
-       (tpgid . number)
-       (minflt . number)
-       (majflt . number)
-       (time . tramp-ps-time)
-       (pri . number)
-       (nice . number)
-       (vsize . number)
-       (rss . number)
-       (etime . number)
-       (pcpu . number)
-       (pmem . number)
-       (args)))
+      (tramp-process-attributes-ps-args "-acxww" "-o"
+                                        "pid,euid,user,egid,egroup,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                        "-o"
+                                        "state,ppid,pgid,sid,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etimes,pcpu,pmem,args")
+      (tramp-process-attributes-ps-format (pid . number)
+                                          (euid . number)
+                                          (user . string)
+                                          (egid . number)
+                                          (group . string) (comm . 52)
+                                          (state . string)
+                                          (ppid . number)
+                                          (pgrp . number)
+                                          (sess . number)
+                                          (ttname . string)
+                                          (tpgid . number)
+                                          (minflt . number)
+                                          (majflt . number)
+                                          (time . tramp-ps-time)
+                                          (pri . number)
+                                          (nice . number)
+                                          (vsize . number)
+                                          (rss . number)
+                                          (etime . number)
+                                          (pcpu . number)
+                                          (pmem . number) (args)))
      (tramp-connection-local-default-shell-profile
-      (shell-file-name . "/bin/sh")
-      (shell-command-switch . "-c"))
+      (shell-file-name . "/bin/sh") (shell-command-switch . "-c"))
      (tramp-connection-local-default-system-profile
-      (path-separator . ":")
-      (null-device . "/dev/null"))))
+      (path-separator . ":") (null-device . "/dev/null"))))
  '(css-indent-offset 2)
  '(cua-global-mark-cursor-color "#2aa198")
  '(cua-normal-cursor-color "#657b83")
@@ -1432,27 +1446,46 @@
  '(cursor-type 'bar)
  '(custom-enabled-themes '(sanityinc-solarized-light))
  '(custom-safe-themes
-   '("ff9e6deb9cfc908381c1267f407b8830bcad6028231a5f736246b9fc65e92b44" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" "d1dbd38c2fef808a27bb411ecff76a0a8026856a16cb2a1fb8820bedeb45740a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default))
+   '("ff9e6deb9cfc908381c1267f407b8830bcad6028231a5f736246b9fc65e92b44"
+     "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f"
+     "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e"
+     "d1dbd38c2fef808a27bb411ecff76a0a8026856a16cb2a1fb8820bedeb45740a"
+     "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0"
+     "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4"
+     "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4"
+     "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879"
+     default))
  '(custom-theme-load-path
-   '("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/" "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2" custom-theme-directory t) t)
+   '("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/"
+     "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2"
+     custom-theme-directory t) t)
  '(deft-auto-save-interval 60.0)
  '(deft-extensions '("md" "txt" "text" "markdown" "org"))
  '(deft-markdown-mode-title-level 2)
  '(dired-dwim-target t)
  '(display-buffer-alist '(("\\*shell" display-buffer-same-window (nil))))
+ '(eglot-code-action-indications '(mode-line))
+ '(eglot-confirm-server-edits nil)
  '(eglot-confirm-server-initiated-edits nil)
+ '(eglot-events-buffer-config '(:size 0 :format short))
  '(eldoc-echo-area-use-multiline-p nil)
  '(exec-path
-   '("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin"))
+   '("/usr/local/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin"
+     "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_9"
+     "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_9"
+     "/Applications/Emacs.app/Contents/MacOS/libexec"
+     "/Applications/Emacs.app/Contents/MacOS/bin"))
  '(exec-path-from-shell-variables
-   '("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS" "JAVA_HOME" "LSP_USE_PLISTS"))
+   '("PATH" "CORE_MODE" "MANPATH" "GOOGLE_APPLICATION_CREDENTIALS"
+     "JAVA_HOME" "LSP_USE_PLISTS"))
  '(explicit-shell-file-name nil)
  '(eyebrowse-wrap-around t)
  '(flycheck-disabled-checkers '(html-tidy))
  '(flyspell-issue-message-flag nil)
  '(fringe-mode '(1 . 1) nil (fringe))
  '(grep-find-ignored-directories
-   '("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "node_modules" "public"))
+   '("SCCS" "RCS" "CVS" "MCVS" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs"
+     "{arch}" "node_modules" "public"))
  '(helm-buffer-max-length nil)
  '(helm-lisp-fuzzy-completion t)
  '(helm-mode nil)
@@ -1462,34 +1495,25 @@
  '(helm-swoop-split-with-multiple-windows t)
  '(highlight-changes-colors '("#d33682" "#6c71c4"))
  '(highlight-symbol-colors
-   (--map
-    (solarized-color-blend it "#fdf6e3" 0.25)
-    '("#b58900" "#2aa198" "#dc322f" "#6c71c4" "#859900" "#cb4b16" "#268bd2")))
+   (--map (solarized-color-blend it "#fdf6e3" 0.25)
+          '("#b58900" "#2aa198" "#dc322f" "#6c71c4" "#859900"
+            "#cb4b16" "#268bd2")))
  '(highlight-symbol-foreground-color "#586e75")
  '(highlight-tail-colors
-   '(("#eee8d5" . 0)
-     ("#B4C342" . 20)
-     ("#69CABF" . 30)
-     ("#69B7F0" . 50)
-     ("#DEB542" . 60)
-     ("#F2804F" . 70)
-     ("#F771AC" . 85)
+   '(("#eee8d5" . 0) ("#B4C342" . 20) ("#69CABF" . 30) ("#69B7F0" . 50)
+     ("#DEB542" . 60) ("#F2804F" . 70) ("#F771AC" . 85)
      ("#eee8d5" . 100)))
  '(hl-bg-colors
-   '("#DEB542" "#F2804F" "#FF6E64" "#F771AC" "#9EA0E5" "#69B7F0" "#69CABF" "#B4C342"))
+   '("#DEB542" "#F2804F" "#FF6E64" "#F771AC" "#9EA0E5" "#69B7F0"
+     "#69CABF" "#B4C342"))
  '(hl-fg-colors
-   '("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3"))
+   '("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3"
+     "#fdf6e3" "#fdf6e3"))
  '(ibuffer-formats
-   '((mark modified read-only locked " "
-           (name 40 40 :left :elide)
-           " "
-           (size 9 -1 :right)
-           " "
-           (mode 16 16 :left :elide)
-           " " filename-and-process)
-     (mark " "
-           (name 16 -1)
-           " " filename)))
+   '((mark modified read-only locked " " (name 40 40 :left :elide) " "
+           (size 9 -1 :right) " " (mode 16 16 :left :elide) " "
+           filename-and-process)
+     (mark " " (name 16 -1) " " filename)))
  '(ido-cr+-auto-update-blacklist t)
  '(inhibit-startup-screen t)
  '(initial-major-mode 'fundamental-mode)
@@ -1542,15 +1566,10 @@
  '(org-agenda-files '("~/org/" "~/Documents/journal/"))
  '(org-agenda-window-setup 'other-window)
  '(org-capture-templates
-   '(("t" "Todo" entry
-      (file "~/org/notes.org")
-      "* TODO %?")
-     ("j" "Journal entry" entry
-      (file+datetree "~/org/journal.org")
+   '(("t" "Todo" entry (file "~/org/notes.org") "* TODO %?")
+     ("j" "Journal entry" entry (file+datetree "~/org/journal.org")
       "* %?")
-     ("n" "Note in plain text" plain
-      (file "~/org/notes.txt")
-      "")))
+     ("n" "Note in plain text" plain (file "~/org/notes.txt") "")))
  '(org-default-notes-file "~/org/notes.org")
  '(org-journal-date-format "%A, %-e.%m.%Y")
  '(org-journal-hide-entries-p nil)
@@ -1560,7 +1579,21 @@
    '(("gnu" . "http://elpa.gnu.org/packages/")
      ("Melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(undo-tree todotxt copy-as-format wconf counsel counsel-projectile php-mode sass-mode docker flycheck-popup-tip flycheck-clj-kondo defproject cider yaml-mode groovy-mode make-color deadgrep iedit tramp-term projectile-ripgrep xterm-color easy-kill deft hl-line+ perspective beacon prodigy swiper ivy projector better-shell clojure-mode company magit python-mode smartparens tern ac-js2 xref-js2 web-mode syslog-mode solarized-theme smart-mode-line rainbow-delimiters powerline pandoc-mode multiple-cursors markdown-mode imenu-anywhere ido-ubiquitous ggtags exec-path-from-shell eval-sexp-fu dumb-jump color-theme-sanityinc-solarized color-identifiers-mode clojure-mode-extra-font-locking clojure-cheatsheet autopair align-cljlet ag ace-window))
+   '(undo-tree todotxt copy-as-format wconf counsel counsel-projectile
+               php-mode sass-mode docker flycheck-popup-tip
+               flycheck-clj-kondo defproject cider yaml-mode
+               groovy-mode make-color deadgrep iedit tramp-term
+               projectile-ripgrep xterm-color easy-kill deft hl-line+
+               perspective beacon prodigy swiper ivy projector
+               better-shell clojure-mode company magit python-mode
+               smartparens tern ac-js2 xref-js2 web-mode syslog-mode
+               solarized-theme smart-mode-line rainbow-delimiters
+               powerline pandoc-mode multiple-cursors markdown-mode
+               imenu-anywhere ido-ubiquitous ggtags
+               exec-path-from-shell eval-sexp-fu dumb-jump
+               color-theme-sanityinc-solarized color-identifiers-mode
+               clojure-mode-extra-font-locking clojure-cheatsheet
+               autopair align-cljlet ag ace-window))
  '(paradox-automatically-star nil)
  '(persp-show-modestring nil)
  '(pos-tip-background-color "#eee8d5")
@@ -1583,25 +1616,30 @@
      (cider-default-clj-repl . lein)
      (cider-default-cljs-repl . shadow-cljs)
      (eval font-lock-add-keywords nil
-           `((,(concat "("
-                       (regexp-opt
-                        '("sp-do-move-op" "sp-do-move-cl" "sp-do-put-op" "sp-do-put-cl" "sp-do-del-op" "sp-do-del-cl")
-                        t)
-                       "\\_>")
-              1 'font-lock-variable-name-face)))
+           `
+           ((,(concat "("
+                      (regexp-opt
+                       '("sp-do-move-op" "sp-do-move-cl"
+                         "sp-do-put-op" "sp-do-put-cl" "sp-do-del-op"
+                         "sp-do-del-cl")
+                       t)
+                      "\\_>")
+             1 'font-lock-variable-name-face)))
      (cider-ns-refresh-after-fn . "integrant.repl/resume")
      (cider-ns-refresh-before-fn . "integrant.repl/suspend")
      (cider-refresh-after-fn . "integrant.repl/resume")
      (cider-refresh-before-fn . "integrant.repl/suspend")
-     (eval setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home")
-     (eval setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home")
+     (eval setenv "JAVA_HOME"
+           "/Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home")
+     (eval setenv "JAVA_HOME"
+           "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home")
      (eval
-      (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home"))
+      (setenv "JAVA_HOME"
+              "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home"))
      (cider-default-cljs-repl . "figwheel")
      (cider-default-cljs-repl . figwheel)
      (cider-default-cljs-repl quote figwheel)
-     (cider-default-cljs-repl . "Figwheel")
-     (encoding . utf-8)))
+     (cider-default-cljs-repl . "Figwheel") (encoding . utf-8)))
  '(scss-compile-at-save nil)
  '(show-paren-mode nil)
  '(show-smartparens-global-mode t)
@@ -1615,13 +1653,9 @@
  '(sp-no-reindent-after-kill-modes '(coffee-mode js2-mode js3-mode robot-mode))
  '(sp-sexp-prefix '((emacs-lisp-mode regexp "\\(?:,@\\|[',`]\\)")))
  '(sp-sexp-suffix
-   '((inferior-python-mode regexp "")
-     (python-mode regexp "")
-     (js3-mode regexp "")
-     (js2-mode regexp "")
-     (ruby-mode syntax "")
-     (robot-mode regexp "")
-     (scss-mode regexp "")))
+   '((inferior-python-mode regexp "") (python-mode regexp "")
+     (js3-mode regexp "") (js2-mode regexp "") (ruby-mode syntax "")
+     (robot-mode regexp "") (scss-mode regexp "")))
  '(speedbar-hide-button-brackets-flag t)
  '(speedbar-show-unknown-files t)
  '(speedbar-use-images nil)
@@ -1632,11 +1666,16 @@
  '(term-default-bg-color "#fdf6e3")
  '(term-default-fg-color "#657b83")
  '(tool-bar-mode nil)
+ '(tooltip-mode nil)
  '(vterm-always-compile-module t)
  '(web-mode-code-indent-offset 2)
  '(web-mode-enable-current-column-highlight t)
  '(weechat-color-list
-   '(unspecified "#fdf6e3" "#eee8d5" "#990A1B" "#dc322f" "#546E00" "#859900" "#7B6000" "#b58900" "#00629D" "#268bd2" "#93115C" "#d33682" "#00736F" "#2aa198" "#657b83" "#839496")))
+   '(unspecified "#fdf6e3" "#eee8d5" "#990A1B" "#dc322f" "#546E00"
+                 "#859900" "#7B6000" "#b58900" "#00629D" "#268bd2"
+                 "#93115C" "#d33682" "#00736F" "#2aa198" "#657b83"
+                 "#839496"))
+ '(xref-search-program 'ripgrep))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -1648,6 +1687,7 @@
  '(cider-test-failure-face ((t (:background "orange red" :foreground "white"))))
  '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
  '(company-tooltip ((t (:background "wheat2"))))
+ '(eglot-diagnostic-tag-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "black"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
  '(flycheck-error ((t (:background "misty rose" :foreground "gray40" :underline nil))))
  '(flycheck-warning ((t (:background "LightGoldenrod1" :underline nil))))
