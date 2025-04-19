@@ -34,6 +34,66 @@
 (straight-use-package 'copy-as-format)
 (straight-use-package 'csv-mode)
 
+;;(straight-use-package 'nerd-icons)
+
+(use-package all-the-icons
+  :straight t
+  :if (display-graphic-p))
+
+;; (use-package vscode-icon
+;;   :straight t
+;;   :ensure t
+;;   :commands (vscode-icon-for-file))
+
+(use-package dired
+  :config
+  (setq dired-listing-switches
+        "-l --almost-all --human-readable --group-directories-first --no-group")
+  ;; this command is useful when you want to close the window of `dirvish-side'
+  ;; automatically when opening a file
+  (put 'dired-find-alternate-file 'disabled nil))
+
+(use-package dirvish
+  :straight t
+  :ensure t
+  :init
+  (dirvish-override-dired-mode)
+  :custom
+  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+   '(("h" "~/"            "Home")
+     ("d" "~/Downloads/"  "Downloads")
+     ("t" "~/Desktop"     "Desktop")))
+  :config
+  ;; (dirvish-peek-mode)             ; Preview files in minibuffer
+  ;; (dirvish-side-follow-mode)      ; similar to `treemacs-follow-mode'
+  (setq dirvish-default-layout '(0 0.4 0.6))
+  (setq dirvish-mode-line-format
+        '(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-attributes           ; The order *MATTERS* for some attributes
+        '(vc-state subtree-state all-the-icons collapse file-time file-size)
+        dirvish-side-attributes
+        '(vc-state all-the-icons collapse file-size))
+  :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
+  (("C-c f" . dirvish)
+   :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
+   (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
+   ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
+   ("a"   . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
+   ("f"   . dirvish-file-info-menu)    ; [f]ile info
+   ("o"   . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
+   ("s"   . dirvish-quicksort)         ; [s]ort flie list
+   ("r"   . dirvish-history-jump)      ; [r]ecent visited
+   ("l"   . dirvish-ls-switches-menu)  ; [l]s command flags
+   ("v"   . dirvish-vc-menu)           ; [v]ersion control commands
+   ("*"   . dirvish-mark-menu)
+   ("y"   . dirvish-yank-menu)
+   ("N"   . dirvish-narrow)
+   ("^"   . dirvish-history-last)
+   ("TAB" . dirvish-subtree-toggle)
+   ("M-f" . dirvish-history-go-forward)
+   ("M-b" . dirvish-history-go-backward)
+   ("M-e" . dirvish-emerge-menu)))
+
 (use-package eldoc :straight (:type built-in))
 
 (straight-use-package 'project)
@@ -67,7 +127,7 @@
 ;;   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 ;;   (ivy-rich-mode t))
 (straight-use-package 'prescient)
-(straight-use-package 'corfu-prescient)
+;;(straight-use-package 'corfu-prescient)
 (straight-use-package 'vertico-prescient)
 ;; (straight-use-package 'ivy-prescient)
 ;; (straight-use-package 'company-prescient)
@@ -132,6 +192,16 @@
   ((yaml-mode . (lambda () (ansible 1)))
    (ansible . ansible-auto-decrypt-encrypt)))
 
+(use-package lsp-bridge
+  :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+            :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+            :build (:not compile))
+  :init
+  (global-lsp-bridge-mode)
+  :custom
+  (acm-enable-capf t)
+  (acm-enable-lsp-workspace-symbol t))
+
 (use-package vertico
   :straight t
   :init
@@ -161,7 +231,8 @@
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+        completion-category-overrides '((file (styles partial-completion))))
+  )
 
 
 ;; Configure directory extension. Part of Vertico.
@@ -360,40 +431,40 @@
   ;; (corfu-echo-mode)
   )
 
-(use-package corfu
-  :straight t
-  ;; Optional customizations
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
+;; (use-package corfu
+;;   :straight t
+;;   ;; Optional customizations
+;;   :custom
+;;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+;;   (corfu-auto t)                 ;; Enable auto completion
 
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+;;   ;; (corfu-separator ?\s)          ;; Orderless field separator
+;;   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;;   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+;;   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+;;   ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+;;   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+;;   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+;;   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
+;;   ;; Enable Corfu only for certain modes.
+;;   ;; :hook ((prog-mode . corfu-mode)
+;;   ;;        (shell-mode . corfu-mode)
+;;   ;;        (eshell-mode . corfu-mode))
 
-  :bind
-  (:map corfu-map
-        ("<right>" . corfu-quit)
-        ("<left>" . corfu-quit))
+;;   :bind
+;;   (:map corfu-map
+;;         ("<right>" . corfu-quit)
+;;         ("<left>" . corfu-quit))
 
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  :init
-  (global-corfu-mode)
-  (corfu-prescient-mode)
-  (setq corfu-prescient-completion-styles '(prescient basic partial-completion))
-  (corfu-echo-mode))
+;;   ;; Recommended: Enable Corfu globally.
+;;   ;; This is recommended since Dabbrev can be used globally (M-/).
+;;   ;; See also `corfu-excluded-modes'.
+;;   :init
+;;   (global-corfu-mode)
+;;   (corfu-prescient-mode)
+;;   (setq corfu-prescient-completion-styles '(prescient basic partial-completion))
+;;   (corfu-echo-mode))
 
 (use-package cape
   :straight t
@@ -457,15 +528,15 @@
 
 ;;(straight-use-package 'undo-tree)
 
-(use-package eglot
-  :straight t
-  :hook ((clojure-mode . eglot-ensure)
-         (js2-mode . eglot-ensure))
-  :init
-  ;; Don't log every event for better performance
-  (fset #'jsonrpc--log-event #'ignore)
-  :custom
-  (eglot-connect-timeout 300))
+;; (use-package eglot
+;;   :straight t
+;;   :hook ((clojure-mode . eglot-ensure)
+;;          (js2-mode . eglot-ensure))
+;;   :init
+;;   ;; Don't log every event for better performance
+;;   (fset #'jsonrpc--log-event #'ignore)
+;;   :custom
+;;   (eglot-connect-timeout 300))
 
 ;; (use-package lsp-mode
 ;;   :straight t
@@ -488,11 +559,14 @@
    '(lsp-flycheck-info-unnecessary-face ((t (:underline (:color "#2aa198" :style wave :position wave) :foreground "gray5"))) t)
    '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "gray30" :underline nil))) t)))
 
+(defun lsp-organize-imports ()
+  (interactive)
+  (lsp-bridge-code-action "source.organizeImports"))
 
-(defun corfu-lsp-setup ()
-  (setq-local completion-styles '(orderless)
-              completion-category-defaults nil))
-(add-hook 'lsp-mode-hook #'corfu-lsp-setup)
+;; (defun corfu-lsp-setup ()
+;;   (setq-local completion-styles '(orderless)
+;;               completion-category-defaults nil))
+;; (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
 
 (use-package emacs
   :ensure nil
@@ -531,13 +605,9 @@
 (straight-use-package 'xterm-color)
 (straight-use-package 'yaml-mode)
 
-(use-package all-the-icons
-  :straight t
-  :if (display-graphic-p))
-
-(use-package all-the-icons-dired
-  :straight t
-  :hook (dired-mode . all-the-icons-dired-mode))
+;; (use-package all-the-icons-dired
+;;   :straight t
+;;   :hook (dired-mode . all-the-icons-dired-mode))
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
@@ -855,7 +925,7 @@
   ;; clj-refactor loads too much ns on connect. Do not use!
   ;; (require 'clj-refactor)
   ;; (clj-refactor-mode 1)
-  ;; (yas-minor-mode 1) ; for adding require/use/import
+  (yas-minor-mode 1) ; for adding require/use/import
   ;; (cljr-add-keybindings-with-prefix "C-c C-m")
   ;; (require 'cljr-helm)
   ;; (define-key clojure-mode-map (kbd "C-c r") 'cljr-helm)
@@ -901,6 +971,7 @@
 (add-hook 'cider-repl-mode-hook
           (lambda ()
             (eldoc-mode t)
+            (cider-enable-cider-completion-style)
             (define-key cider-repl-mode-map (kbd "s-'") 'cider-switch-to-last-clojure-buffer)
             (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)
             (define-key cider-repl-mode-map (kbd "<S-return>") 'cider-repl-newline-and-indent)
@@ -1346,6 +1417,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(acm-candidate-match-function 'orderless-prefixes)
  '(all-the-icons-dired-monochrome nil)
  '(auto-revert-check-vc-info nil)
  '(auto-revert-interval 2)
@@ -1605,6 +1677,7 @@
  '(manual-program "gman")
  '(nrepl-sync-request-timeout 60)
  '(ns-function-modifier 'hyper)
+ '(orderless-matching-styles '(orderless-regexp orderless-literal orderless-prefixes))
  '(org-agenda-files '("~/org/" "~/Documents/journal/"))
  '(org-agenda-window-setup 'other-window)
  '(org-capture-templates
