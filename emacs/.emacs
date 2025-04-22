@@ -32,6 +32,13 @@
 ;; (straight-use-package 'company)
 ;; (straight-use-package 'company-quickhelp)
 (straight-use-package 'copy-as-format)
+
+(use-package copilot-chat
+  :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
+  :after (request org markdown-mode))
+
+(add-hook 'org-mode-hook #'visual-line-mode)
+
 (straight-use-package 'csv-mode)
 
 ;;(straight-use-package 'nerd-icons)
