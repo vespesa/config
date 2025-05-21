@@ -35,7 +35,11 @@
 
 (use-package copilot-chat
   :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :after (request org markdown-mode))
+  :bind ("C-x c" . copilot-chat-display)
+  :custom
+  (copilot-chat-default-model "claude-3.7-sonnet")
+  ;;:after (request org markdown-mode)
+  )
 
 (add-hook 'org-mode-hook #'visual-line-mode)
 
@@ -81,7 +85,7 @@
         dirvish-side-attributes
         '(vc-state all-the-icons collapse file-size))
   :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
-  (("C-c f" . dirvish)
+  (("C-x d" . dirvish)
    :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
    (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
    ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
@@ -109,7 +113,13 @@
 ;;(straight-use-package 'dash)
 (straight-use-package 'deadgrep)
 (straight-use-package 'defproject)
-(straight-use-package 'deft)
+(use-package deft
+  :straight t
+  :custom
+  (deft-auto-save-interval 60.0)
+  (deft-extensions '( "org" "md" "txt" "text" "markdown"))
+  (deft-markdown-mode-title-level 2))
+
 (straight-use-package 'docker)
 (straight-use-package 'dumb-jump)
 (straight-use-package 'easy-kill)
@@ -205,9 +215,14 @@
             :build (:not compile))
   :init
   (global-lsp-bridge-mode)
+  :bind
+  ("M-?" . lsp-bridge-find-references)
   :custom
   (acm-enable-capf t)
-  (acm-enable-lsp-workspace-symbol t))
+  (acm-enable-ctags t)
+  (acm-candidate-match-function 'orderless-flex)
+  ;;(acm-enable-lsp-workspace-symbol t)
+  (acm-enable-copilot t))
 
 (use-package vertico
   :straight t
@@ -429,14 +444,14 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package corfu-echo
-  ;; :after corfu
-  :straight nil
-  :load-path "straight/repos/corfu/extensions/"
-  :ensure nil
-  ;; :init
-  ;; (corfu-echo-mode)
-  )
+;; (use-package corfu-echo
+;;   ;; :after corfu
+;;   :straight nil
+;;   :load-path "straight/repos/corfu/extensions/"
+;;   :ensure nil
+;;   ;; :init
+;;   ;; (corfu-echo-mode)
+;;   )
 
 ;; (use-package corfu
 ;;   :straight t
@@ -1424,7 +1439,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(acm-candidate-match-function 'orderless-prefixes)
  '(all-the-icons-dired-monochrome nil)
  '(auto-revert-check-vc-info nil)
  '(auto-revert-interval 2)
@@ -1435,7 +1449,7 @@
  '(beacon-mode nil)
  '(blink-cursor-mode nil)
  '(c-basic-offset 2)
- '(calendar-today-visible-hook '(calendar-mark-today org-journal-mark-entries) t)
+ '(calendar-today-visible-hook '(calendar-mark-today org-journal-mark-entries))
  '(calendar-week-start-day 1)
  '(cider-download-java-sources t)
  '(cider-enrich-classpath nil)
@@ -1580,9 +1594,6 @@
    '("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/"
      "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2"
      custom-theme-directory t) t)
- '(deft-auto-save-interval 60.0)
- '(deft-extensions '("md" "txt" "text" "markdown" "org"))
- '(deft-markdown-mode-title-level 2)
  '(dired-dwim-target t)
  '(display-buffer-alist '(("\\*shell" display-buffer-same-window (nil))))
  '(eglot-code-action-indications '(mode-line))
@@ -1638,6 +1649,7 @@
  '(ido-cr+-auto-update-blacklist t)
  '(inhibit-startup-screen t)
  '(initial-major-mode 'fundamental-mode)
+ '(insert-directory-program "gls")
  '(ivy-height 20)
  '(ivy-prescient-mode t)
  '(ivy-rich-path-style '## nil nil "Customized with use-package ivy-rich")
@@ -1826,6 +1838,10 @@
  '(ivy-modified-buffer ((t (:foreground "firebrick"))))
  '(ivy-virtual ((t nil)))
  '(lazy-highlight ((t (:background "paleturquoise2"))))
+ '(lsp-bridge-ref-font-lock-function-location ((t (:foreground "green4" :weight bold))))
+ '(lsp-bridge-ref-font-lock-header-line-edit-mode ((t (:foreground "dark blue" :weight bold))))
+ '(lsp-bridge-ref-font-lock-header-line-text ((t (:foreground "SpringGreen4" :weight bold))))
+ '(lsp-bridge-ref-font-lock-match ((t (:foreground "firebrick3" :weight bold))))
  '(lsp-flycheck-info-unnecessary-face ((t (:underline (:color "#2aa198" :style wave :position wave) :foreground "gray5"))) t)
  '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "gray30" :underline nil))) t)
  '(mode-line ((t (:background "papaya whip" :foreground "black" :box (:line-width 1 :color "#657b83") :weight normal))))
