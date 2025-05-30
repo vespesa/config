@@ -16,6 +16,9 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(defvar use-lsp-bridge)
+(setq use-lsp-bridge t)
+
 (straight-use-package 'use-package)
 (straight-use-package 'ac-js2)
 (straight-use-package 'ace-window)
@@ -40,6 +43,24 @@
   (copilot-chat-default-model "claude-3.7-sonnet")
   ;;:after (request org markdown-mode)
   )
+
+(unless use-lsp-bridge
+  (use-package copilot
+    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+    :ensure t
+    :hook (prog-mode . copilot-mode)
+    :bind (:map copilot-completion-map
+                ("C-<tab>" . copilot-accept-completion)
+                ("<backtab>" . copilot-accept-completion)
+                ("C-TAB" . copilot-accept-completion)
+                ("C-<return>" . copilot-accept-completion-by-word)
+                ("C-M-<return>" . copilot-accept-completion-by-line))
+    :config
+    (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+    (add-to-list 'copilot-indentation-alist '(org-mode 2))
+    (add-to-list 'copilot-indentation-alist '(text-mode 2))
+    (add-to-list 'copilot-indentation-alist '(closure-mode 2))
+    (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
 
 (add-hook 'org-mode-hook #'visual-line-mode)
 
@@ -144,7 +165,8 @@
 ;;   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 ;;   (ivy-rich-mode t))
 (straight-use-package 'prescient)
-;;(straight-use-package 'corfu-prescient)
+(unless use-lsp-bridge
+  (straight-use-package 'corfu-prescient))
 (straight-use-package 'vertico-prescient)
 ;; (straight-use-package 'ivy-prescient)
 ;; (straight-use-package 'company-prescient)
@@ -209,20 +231,21 @@
   ((yaml-mode . (lambda () (ansible 1)))
    (ansible . ansible-auto-decrypt-encrypt)))
 
-(use-package lsp-bridge
-  :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
-            :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
-            :build (:not compile))
-  :init
-  (global-lsp-bridge-mode)
-  :bind
-  ("M-?" . lsp-bridge-find-references)
-  :custom
-  (acm-enable-capf t)
-  (acm-enable-ctags t)
-  (acm-candidate-match-function 'orderless-flex)
-  ;;(acm-enable-lsp-workspace-symbol t)
-  (acm-enable-copilot t))
+(when use-lsp-bridge
+  (use-package lsp-bridge
+   :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+                          :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+                          :build (:not compile))
+   :init
+   (global-lsp-bridge-mode)
+   :bind
+   ("M-?" . lsp-bridge-find-references)
+   :custom
+   (acm-enable-capf t)
+   (acm-enable-ctags t)
+   (acm-candidate-match-function 'orderless-flex)
+   ;;(acm-enable-lsp-workspace-symbol t)
+   (acm-enable-copilot t)))
 
 (use-package vertico
   :straight t
@@ -444,49 +467,50 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-;; (use-package corfu-echo
-;;   ;; :after corfu
-;;   :straight nil
-;;   :load-path "straight/repos/corfu/extensions/"
-;;   :ensure nil
-;;   ;; :init
-;;   ;; (corfu-echo-mode)
-;;   )
+(unless use-lsp-bridge
+  (use-package corfu-echo
+    ;; :after corfu
+    :straight nil
+    :load-path "straight/repos/corfu/extensions/"
+    :ensure nil
+    ;; :init
+    ;; (corfu-echo-mode)
+    )
 
-;; (use-package corfu
-;;   :straight t
-;;   ;; Optional customizations
-;;   :custom
-;;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-;;   (corfu-auto t)                 ;; Enable auto completion
+  (use-package corfu
+    :straight t
+    ;; Optional customizations
+    :custom
+    (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    (corfu-auto t)                 ;; Enable auto completion
 
-;;   ;; (corfu-separator ?\s)          ;; Orderless field separator
-;;   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-;;   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-;;   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-;;   ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-;;   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-;;   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-;;   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+    ;; (corfu-separator ?\s)          ;; Orderless field separator
+    ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+    ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+    ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+    ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+    ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+    ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+    ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
-;;   ;; Enable Corfu only for certain modes.
-;;   ;; :hook ((prog-mode . corfu-mode)
-;;   ;;        (shell-mode . corfu-mode)
-;;   ;;        (eshell-mode . corfu-mode))
+    ;; Enable Corfu only for certain modes.
+    ;; :hook ((prog-mode . corfu-mode)
+    ;;        (shell-mode . corfu-mode)
+    ;;        (eshell-mode . corfu-mode))
 
-;;   :bind
-;;   (:map corfu-map
-;;         ("<right>" . corfu-quit)
-;;         ("<left>" . corfu-quit))
+    :bind
+    (:map corfu-map
+          ("<right>" . corfu-quit)
+          ("<left>" . corfu-quit))
 
-;;   ;; Recommended: Enable Corfu globally.
-;;   ;; This is recommended since Dabbrev can be used globally (M-/).
-;;   ;; See also `corfu-excluded-modes'.
-;;   :init
-;;   (global-corfu-mode)
-;;   (corfu-prescient-mode)
-;;   (setq corfu-prescient-completion-styles '(prescient basic partial-completion))
-;;   (corfu-echo-mode))
+    ;; Recommended: Enable Corfu globally.
+    ;; This is recommended since Dabbrev can be used globally (M-/).
+    ;; See also `corfu-excluded-modes'.
+    :init
+    (global-corfu-mode)
+    (corfu-prescient-mode)
+    (setq corfu-prescient-completion-styles '(prescient basic partial-completion))
+    (corfu-echo-mode)))
 
 (use-package cape
   :straight t
@@ -550,15 +574,23 @@
 
 ;;(straight-use-package 'undo-tree)
 
-;; (use-package eglot
-;;   :straight t
-;;   :hook ((clojure-mode . eglot-ensure)
-;;          (js2-mode . eglot-ensure))
-;;   :init
-;;   ;; Don't log every event for better performance
-;;   (fset #'jsonrpc--log-event #'ignore)
-;;   :custom
-;;   (eglot-connect-timeout 300))
+(unless use-lsp-bridge
+  (use-package eglot
+    :straight (:type built-in)
+    :hook ((clojure-mode . eglot-ensure)
+           (js2-mode . eglot-ensure))
+    :init
+    ;; Don't log every event for better performance
+    (fset #'jsonrpc--log-event #'ignore)
+    :custom
+    (eglot-connect-timeout 300))
+
+  (use-package eglot-booster
+    :straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")
+    :after eglot
+    :config (eglot-booster-mode))
+
+  )
 
 ;; (use-package lsp-mode
 ;;   :straight t
@@ -581,9 +613,10 @@
    '(lsp-flycheck-info-unnecessary-face ((t (:underline (:color "#2aa198" :style wave :position wave) :foreground "gray5"))) t)
    '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "gray30" :underline nil))) t)))
 
-(defun lsp-organize-imports ()
-  (interactive)
-  (lsp-bridge-code-action "source.organizeImports"))
+(when use-lsp-bridge
+  (defun lsp-organize-imports ()
+    (interactive)
+    (lsp-bridge-code-action "source.organizeImports")))
 
 ;; (defun corfu-lsp-setup ()
 ;;   (setq-local completion-styles '(orderless)
