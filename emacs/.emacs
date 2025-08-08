@@ -17,7 +17,13 @@
   (load bootstrap-file nil 'nomessage))
 
 (defvar use-lsp-bridge)
-(setq use-lsp-bridge t)
+(setq use-lsp-bridge nil)
+
+(defvar use-eglot)
+(setq use-eglot t)
+
+(defvar use-lsp-mode)
+(setq use-lsp-mode nil)
 
 (straight-use-package 'use-package)
 (straight-use-package 'ac-js2)
@@ -44,23 +50,34 @@
   ;;:after (request org markdown-mode)
   )
 
-(unless use-lsp-bridge
-  (use-package copilot
-    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-    :ensure t
-    :hook (prog-mode . copilot-mode)
-    :bind (:map copilot-completion-map
-                ("C-<tab>" . copilot-accept-completion)
-                ("<backtab>" . copilot-accept-completion)
-                ("C-TAB" . copilot-accept-completion)
-                ("C-<return>" . copilot-accept-completion-by-word)
-                ("C-M-<return>" . copilot-accept-completion-by-line))
-    :config
-    (add-to-list 'copilot-indentation-alist '(prog-mode 2))
-    (add-to-list 'copilot-indentation-alist '(org-mode 2))
-    (add-to-list 'copilot-indentation-alist '(text-mode 2))
-    (add-to-list 'copilot-indentation-alist '(closure-mode 2))
-    (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
+;; (use-package gptel
+;;   :straight t
+;;   :config
+;;   (setq gptel-model 'claude-3.7-sonnet
+;;         gptel-backend (gptel-make-gh-copilot "Copilot"))
+;;   :custom
+;;   (gptel-default-mode 'org-mode))
+
+;; (unless nil ;use-lsp-bridge
+;;   (use-package copilot
+;;     :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+;;     :ensure t
+;;     :hook (prog-mode . copilot-mode)
+;;     :bind (:map copilot-completion-map
+;;                 ("C-<tab>" . 'copilot-accept-completion)
+;;                 ("C-g" . 'copilot-clear-overlay)
+;;                 ("M-p" . 'copilot-previous-completion)
+;;                 ("M-n" . 'copilot-next-completion)
+;;                 ("<backtab>" . 'copilot-accept-completion)
+;;                 ("C-TAB" . 'copilot-accept-completion)
+;;                 ("C-<return>" . 'copilot-accept-completion-by-word)
+;;                 ("C-M-<return>" . 'copilot-accept-completion-by-line))
+;;     :config
+;;     (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+;;     (add-to-list 'copilot-indentation-alist '(org-mode 2))
+;;     (add-to-list 'copilot-indentation-alist '(text-mode 2))
+;;     (add-to-list 'copilot-indentation-alist '(closure-mode 2))
+;;     (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
 
 (add-hook 'org-mode-hook #'visual-line-mode)
 
@@ -243,9 +260,10 @@
    :custom
    (acm-enable-capf t)
    (acm-enable-ctags t)
-   (acm-candidate-match-function 'orderless-flex)
+   (acm-candidate-match-function 'orderless-prefixes)
    ;;(acm-enable-lsp-workspace-symbol t)
-   (acm-enable-copilot t)))
+   ;;(acm-enable-copilot t)
+   ))
 
 (use-package vertico
   :straight t
@@ -268,16 +286,16 @@
   (setq vertico-sort-function #'prescient-completion-sort))
 
 ;; Optionally use the `orderless' completion style.
-(use-package orderless
-  :straight t
-  :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
-  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion))))
-  )
+;; (use-package orderless
+;;   :straight t
+;;   :init
+;;   ;; Configure a custom style dispatcher (see the Consult wiki)
+;;   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
+;;   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+;;   (setq completion-styles '(orderless basic)
+;;         completion-category-defaults nil
+;;         completion-category-overrides '((file (styles partial-completion))))
+;;   )
 
 
 ;; Configure directory extension. Part of Vertico.
@@ -574,7 +592,7 @@
 
 ;;(straight-use-package 'undo-tree)
 
-(unless use-lsp-bridge
+(when use-eglot
   (use-package eglot
     :straight (:type built-in)
     :hook ((clojure-mode . eglot-ensure)
@@ -588,24 +606,25 @@
   (use-package eglot-booster
     :straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")
     :after eglot
-    :config (eglot-booster-mode))
+    :config (eglot-booster-mode)))
 
-  )
-
-;; (use-package lsp-mode
-;;   :straight t
-;;   :init
-;;   (setq lsp-use-plists t)
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   (setq lsp-completion-provider :none)
-;;   (setq gc-cons-threshold 100000000)
-;;   (setq read-process-output-max (* 1024 1024)) ;; 1mb
-;;   (setq lsp-idle-delay 0.500)
-
-;;   :hook ((clojure-mode . lsp)
-;;          (clojurescript-mode . lsp)
-;;          (js2-mode . lsp))
-;;   :commands lsp)
+(when use-lsp-mode
+  (use-package lsp-mode
+   :straight t
+   :init
+   (setq lsp-use-plists t)
+   (setq lsp-keymap-prefix "C-c l")
+   (setq lsp-completion-provider :none)
+   (setq gc-cons-threshold 100000000)
+   (setq read-process-output-max (* 1024 1024)) ;; 1mb
+   (setq lsp-idle-delay 0.500)
+   (setq lsp-diagnostics-provider :none)
+   :hook ((clojure-mode . lsp)
+          (clojurescript-mode . lsp)
+          (js2-mode . lsp))
+   :commands lsp
+   :bind
+   ("M-?" . lsp-find-references)))
 
 (defun lsp-force-faces ()
   (interactive)
@@ -1013,6 +1032,7 @@
 (setq cider-show-error-buffer nil)
 (setq cider-merge-sessions nil)
 (setq nrepl-log-messages nil)
+(setq cider-use-tooltips nil)
 
 (setq cider-dynamic-indentation nil)
 
@@ -1031,6 +1051,13 @@
             (define-key cider-repl-mode-map (kbd "C-:") 'clojure-toggle-keyword-string)
             (define-key cider-repl-mode-map (kbd "<S-return>") 'cider-repl-newline-and-indent)
             (define-key cider-repl-mode-map (kbd "s-*") 'cider-repl-toggle-pretty-printing)))
+
+(setq cider-test-infer-test-ns
+      (lambda (ns)
+        (cond
+         ((string-match-p "-test$" ns) ns)
+         ((string-match-p "-itest$" ns) ns)
+         (t (concat ns "-test")))))
 
 ;; (defun java8 ()
 ;;   (interactive)
@@ -1488,7 +1515,7 @@
  '(cider-enrich-classpath nil)
  '(cider-offer-to-open-cljs-app-in-browser nil)
  '(cider-pprint-fn 'zprint)
- '(cider-print-fn 'fipp)
+ '(cider-print-fn 'puget)
  '(cider-prompt-for-symbol nil)
  '(cider-repl-display-in-current-window t)
  '(cider-repl-use-pretty-printing nil)
@@ -1857,7 +1884,7 @@
  '(eglot-diagnostic-tag-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "black"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
  '(flycheck-error ((t (:background "misty rose" :foreground "gray40" :underline nil))))
- '(flycheck-warning ((t (:background "LightGoldenrod1" :underline nil))))
+ '(flycheck-warning ((t (:background "LightGoldenrod1" :foreground "black" :underline nil))))
  '(fringe ((t (:background "#fdf6e3"))))
  '(git-gutter:added ((t (:foreground "light green" :weight bold))))
  '(git-gutter:modified ((t (:foreground "SkyBlue1" :weight bold))))
@@ -1875,12 +1902,13 @@
  '(lsp-bridge-ref-font-lock-header-line-edit-mode ((t (:foreground "dark blue" :weight bold))))
  '(lsp-bridge-ref-font-lock-header-line-text ((t (:foreground "SpringGreen4" :weight bold))))
  '(lsp-bridge-ref-font-lock-match ((t (:foreground "firebrick3" :weight bold))))
- '(lsp-flycheck-info-unnecessary-face ((t (:underline (:color "#2aa198" :style wave :position wave) :foreground "gray5"))) t)
- '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "gray30" :underline nil))) t)
+ '(lsp-flycheck-info-unnecessary-face ((t (:foreground "dim gray" :underline (:color "#2aa198" :style wave :position nil)))) t)
+ '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "dark slate gray" :underline nil))) t)
  '(mode-line ((t (:background "papaya whip" :foreground "black" :box (:line-width 1 :color "#657b83") :weight normal))))
  '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
  '(region ((t (:background "light cyan" :inverse-video nil))))
  '(secondary-selection ((t (:extend t :background "LightBlue1"))))
+ '(shadow ((t (:foreground "burlywood4"))))
  '(vertico-current ((t (:extend t :background "LightBlue1"))))
  '(vterm-color-white ((t (:background "DarkOrange1" :foreground "DarkOrange1"))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
