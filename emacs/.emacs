@@ -26,6 +26,9 @@
 (setq use-lsp-mode nil)
 
 (straight-use-package 'use-package)
+
+(straight-use-package 'exec-path-from-shell)
+
 (straight-use-package 'ac-js2)
 (straight-use-package 'ace-window)
 (straight-use-package 'ag)
@@ -34,7 +37,11 @@
 (straight-use-package 'beacon)
 (straight-use-package 'better-shell)
 (straight-use-package 'cider)
-(straight-use-package 'clojure-mode)
+(use-package clojure-mode
+  :straight t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.bb\\'" . clojure-mode)))
+
 (straight-use-package 'clojure-mode-extra-font-locking)
 (straight-use-package 'color-identifiers-mode)
 (straight-use-package 'color-theme-sanityinc-solarized)
@@ -42,59 +49,45 @@
 ;; (straight-use-package 'company-quickhelp)
 (straight-use-package 'copy-as-format)
 
-(use-package copilot-chat
-  :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :bind ("C-x c" . copilot-chat-display)
-  :custom
-  (copilot-chat-default-model "claude-3.7-sonnet")
-  ;;:after (request org markdown-mode)
-  )
 
-;; (use-package gptel
-;;   :straight t
-;;   :config
-;;   (setq gptel-model 'claude-3.7-sonnet
-;;         gptel-backend (gptel-make-gh-copilot "Copilot"))
-;;   :custom
-;;   (gptel-default-mode 'org-mode))
-
-;; (unless nil ;use-lsp-bridge
-;;   (use-package copilot
-;;     :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-;;     :ensure t
-;;     :hook (prog-mode . copilot-mode)
-;;     :bind (:map copilot-completion-map
-;;                 ("C-<tab>" . 'copilot-accept-completion)
-;;                 ("C-g" . 'copilot-clear-overlay)
-;;                 ("M-p" . 'copilot-previous-completion)
-;;                 ("M-n" . 'copilot-next-completion)
-;;                 ("<backtab>" . 'copilot-accept-completion)
-;;                 ("C-TAB" . 'copilot-accept-completion)
-;;                 ("C-<return>" . 'copilot-accept-completion-by-word)
-;;                 ("C-M-<return>" . 'copilot-accept-completion-by-line))
-;;     :config
-;;     (add-to-list 'copilot-indentation-alist '(prog-mode 2))
-;;     (add-to-list 'copilot-indentation-alist '(org-mode 2))
-;;     (add-to-list 'copilot-indentation-alist '(text-mode 2))
-;;     (add-to-list 'copilot-indentation-alist '(closure-mode 2))
-;;     (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
+(defun toggle-copilot-buffer ()
+  "Toggle the visibility of the *Copilot* buffer without deleting windows.
+If the buffer is visible in the current window, switch to the previous buffer.
+If the buffer is visible in another window, switch to that window.
+If the buffer exists but is not visible, display it in the current window.
+If the buffer doesn't exist, display a message."
+  (interactive)
+  (let* ((buffer-name "*Copilot*")
+         (buffer (get-buffer buffer-name))
+         (window (when buffer (get-buffer-window buffer))))
+    (cond
+     ;; Buffer is visible in current window - switch to previous buffer
+     ((and window (eq window (selected-window)))
+      (previous-buffer))
+     ;; Buffer is visible in another window - switch to that window
+     (window
+      (select-window window))
+     ;; Buffer exists but not visible - show it in current window
+     (buffer
+      (switch-to-buffer buffer))
+     ;; Buffer doesn't exist
+     (t
+      (message "Copilot buffer does not exist")))))
 
 (add-hook 'org-mode-hook #'visual-line-mode)
 
-(straight-use-package 'csv-mode)
+(use-package eca
+  :straight (eca :type git :host github :repo "editor-code-assistant/eca-emacs" :files ("*.el"))
+  :bind ("C-x c" . 'eca-chat-toggle-window))
 
-;;(straight-use-package 'nerd-icons)
+(straight-use-package 'csv-mode)
 
 (use-package all-the-icons
   :straight t
   :if (display-graphic-p))
 
-;; (use-package vscode-icon
-;;   :straight t
-;;   :ensure t
-;;   :commands (vscode-icon-for-file))
-
 (use-package dired
+  :straight (:type built-in)
   :config
   (setq dired-listing-switches
         "-l --almost-all --human-readable --group-directories-first --no-group")
@@ -126,6 +119,7 @@
   (("C-x d" . dirvish)
    :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
    (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
+   ("§"   . dired-up-directory)
    ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
    ("a"   . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
    ("f"   . dirvish-file-info-menu)    ; [f]ile info
@@ -145,10 +139,6 @@
 
 (use-package eldoc :straight (:type built-in))
 
-(straight-use-package 'project)
-;; (straight-use-package 'counsel)
-;; (straight-use-package 'counsel-projectile)
-;;(straight-use-package 'dash)
 (straight-use-package 'deadgrep)
 (straight-use-package 'defproject)
 (use-package deft
@@ -162,7 +152,6 @@
 (straight-use-package 'dumb-jump)
 (straight-use-package 'easy-kill)
 (straight-use-package 'eval-sexp-fu)
-(straight-use-package 'exec-path-from-shell)
 (straight-use-package 'flycheck-clj-kondo)
 ;;(straight-use-package 'flycheck-popup-tip)
 ;;(straight-use-package 'flycheck-pos-tip)
@@ -174,24 +163,12 @@
 ;(straight-use-package 'ido-ubiquitous)
 (straight-use-package 'iedit)
 (straight-use-package 'imenu-anywhere)
-;; (straight-use-package 'ivy)
-;; (use-package ivy-rich
-;;   :straight t
-;;   :hook (ivy-mode . ivy-rich-mode)
-;;   :config
-;;   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-;;   (ivy-rich-mode t))
+
 (straight-use-package 'prescient)
 (unless use-lsp-bridge
   (straight-use-package 'corfu-prescient))
 (straight-use-package 'vertico-prescient)
-;; (straight-use-package 'ivy-prescient)
-;; (straight-use-package 'company-prescient)
-;; (use-package ivy-xref
-;;   :straight t
-;;   :config
-;;   (setq xref-show-definitions-function #'ivy-xref-show-defs)
-;;   (setq xref-show-xrefs-function #'ivy-xref-show-defs))
+
 (straight-use-package 'magit)
 (straight-use-package 'magit-gitflow)
 (straight-use-package 'make-color)
@@ -228,7 +205,8 @@
 
 (use-package git-link
 :straight t
-:custom (git-link-default-branch "develop"))
+:custom (git-link-default-branch nil)
+)
 
 (use-package helpful
   :straight t
@@ -391,7 +369,7 @@
         xref-show-definitions-function #'consult-xref)
 
   ;; Configure other variables and modes in the :config section,
-  ;; after lazily loading the package.
+  ;; after lazily loading the package.b
   :config
 
   ;; Optionally configure preview. The default value
@@ -568,6 +546,7 @@
 
 ;; A few more useful configurations...
 (use-package emacs
+  :straight nil
   :init
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
@@ -637,11 +616,6 @@
     (interactive)
     (lsp-bridge-code-action "source.organizeImports")))
 
-;; (defun corfu-lsp-setup ()
-;;   (setq-local completion-styles '(orderless)
-;;               completion-category-defaults nil))
-;; (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
-
 (use-package emacs
   :ensure nil
   :straight nil
@@ -679,21 +653,10 @@
 (straight-use-package 'xterm-color)
 (straight-use-package 'yaml-mode)
 
-;; (use-package all-the-icons-dired
-;;   :straight t
-;;   :hook (dired-mode . all-the-icons-dired-mode))
-
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 (setq default-directory "~/")
 (setq command-line-default-directory "~/")
-
-;; From better defaults. For some reason the package version did not work.
-;;(ido-mode t)
-;;(setq ido-enable-flex-matching t)
-;;(setq ido-everywhere t)
-
-;; (menu-bar-mode -1)
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -729,18 +692,6 @@
                               (switch-to-buffer-other-window "*eshell*" )))
 (global-set-key [remap kill-ring-save] 'easy-kill)
 (global-set-key (kbd "C-M-.") 'xref-find-definitions-other-window)
-
-;;(require 'undo-tree)
-;;(global-undo-tree-mode)
-
-;; (defun vertico-prescient-remember ()
-;;   "Remember the chosen candidate with Prescient."
-;;   (when (>= vertico--index 0)
-;;     (prescient-remember
-;;      (substring-no-properties
-;;       (nth vertico--index vertico--candidates)))))
-;; (advice-add #'vertico-insert :after #'vertico-prescient-remember)
-
 
 (defun eshell/old-clear ()
   "Clear the eshell buffer."
@@ -870,46 +821,11 @@
                    (replace-match (format "\\\\u%04x" a) t))) "äöåÄÖÅ§€")
     (goto-char p)))
 
-
-
-;; Tweaking of installed packages
-;(package-initialize)
-
 ;; Make sure that the Emacs exec path is the same as shell.
 (when (memq window-system '(mac ns))
  (require 'exec-path-from-shell)
  (exec-path-from-shell-initialize))
 (add-hook 'after-init-hook 'exec-path-from-shell-initialize)
-
-;; Helm
-;; (require 'helm)
-;; (require 'helm-config)
-;; (global-set-key (kbd "M-x") 'helm-M-x)
-;; (global-set-key (kbd "C-x b") 'helm-buffers-list)
-;; (global-set-key (kbd "C-s") 'helm-swoop)
-
-;; (define-key helm-map (kbd "<tab>")    'helm-execute-persistent-action)
-;; (define-key helm-map (kbd "M-x") 'helm-select-action)
-
-;; Ivy
-;; (require 'ivy)
-;; (ivy-mode 1)
-;; (global-set-key (kbd "C-s") 'swiper)
-;; (global-set-key (kbd "M-x") 'counsel-M-x)
-;; (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-;; (global-set-key (kbd "C-x r b") 'counsel-bookmark)
-
-; Slim down ivy display
-;; (setq ivy-count-format ""
-;;       ivy-display-style nil
-;;       ivy-minibuffer-faces nil)
-
-;; Use Enter on a directory to navigate into the directory, not open it with dired.
-;;(define-key ivy-minibuffer-map (kbd "C-m") 'ivy-alt-done)
-
-;; Ido ubiquitous
-;; (require 'ido-ubiquitous)
-;; (ido-ubiquitous-mode 1)
 
 ;; Resize default font
 
@@ -1059,58 +975,6 @@
          ((string-match-p "-itest$" ns) ns)
          (t (concat ns "-test")))))
 
-;; (defun java8 ()
-;;   (interactive)
-;;   (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home"))
-
-;; (defun java11 ()
-;;   (interactive)
-;;   (setenv "JAVA_HOME" "/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home"))
-
-;; (defun java8-cider-jack-in ()
-;;   (interactive)
-;;   (java8)
-;;   (cider-jack-in nil))
-
-;; (defun java8-cider-jack-in-clj&cljs ()
-;;   (interactive)
-;;   (java8)
-;;   (cider-jack-in-clj&cljs nil nil))
-
-;; (defun java11-cider-jack-in ()
-;;   (interactive)
-;;   (java11)
-;;   (cider-jack-in nil))
-
-;; (defun java11-cider-jack-in-clj&cljs ()
-;;   (interactive)
-;;   (java11)
-;;   (cider-jack-in-clj&cljs nil nil))
-
-
-;; Figwheel + Cider
-;; (require 'cider)
-;; (defun cider-check-figwheel-requirements ()
-;;   "Check whether we can start a Figwheel ClojureScript REPL."
-;;   t)
-
-
-;; (setq cider-cljs-lein-repl
-;;       "(do (require 'figwheel-sidecar.repl-api)
-;;            (figwheel-sidecar.repl-api/start-figwheel!)
-;;            (figwheel-sidecar.repl-api/cljs-repl))")
-
-;; (defun cider-figwheel-repl ()
-;;   (interactive)
-;;   (save-some-buffers)
-;;   (with-current-buffer (cider-current-repl-buffer)
-;;     (goto-char (point-max))
-;;     (insert "(require 'figwheel-sidecar.repl-api)
-;;              (figwheel-sidecar.repl-api/start-figwheel!) ; idempotent
-;;              (figwheel-sidecar.repl-api/cljs-repl)")
-;;     (cider-repl-return)))
-
-
 ;; Magit (Git support)
 (require 'magit)
 
@@ -1188,32 +1052,6 @@
 (global-set-key (kbd "H-p") 'projectile-find-file)
 (global-set-key (kbd "<f13>") 'projectile-find-file)
 (global-set-key (kbd "<f16>") 'projectile-find-file)
-
-;(require 'project-explorer)
-;(global-set-key (kbd "M-§")
-;                (lambda () (interactive)
-;                  (project-explorer-toggle)))
-
-;; Counsel-projectile
-;; (global-set-key (kbd "s-s")
-;;                 (lambda () (interactive)
-;;                   (counsel-projectile-rg)))
-;; (global-set-key (kbd "H-p") 'counsel-projectile-find-file)
-;; (global-set-key (kbd "<f13>") 'counsel-projectile-find-file)
-;; (global-set-key (kbd "<f16>") 'counsel-projectile-find-file)
-
-
-;; (global-set-key (kbd "s-+")
-;;                 (lambda () (interactive)
-;;                   (set-face-attribute 'default nil :height 110)))
-;; (global-set-key (kbd "C-s-+")
-;;                 (lambda () (interactive)
-;;                   (set-face-attribute 'default nil :height 105)))
-
-
-;; Projector
-;; (require 'projector)
-
 
 ;; CoffeeScript
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
@@ -1746,6 +1584,7 @@
  '(js3-strict-var-hides-function-arg-warning nil)
  '(js3-strict-var-redeclaration-warning nil)
  '(lsp-auto-guess-root t)
+ '(lsp-bridge-python-command "python-lsp-bridge")
  '(lsp-enable-snippet nil)
  '(lsp-headerline-breadcrumb-enable nil)
  '(lsp-lens-enable nil)
@@ -1881,6 +1720,7 @@
  '(cider-test-failure-face ((t (:background "orange red" :foreground "white"))))
  '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
  '(company-tooltip ((t (:background "wheat2"))))
+ '(eca-chat-context-cursor-face ((t (:foreground "LightSalmon3" :underline t :height 0.9))))
  '(eglot-diagnostic-tag-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "black"))))
  '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
  '(flycheck-error ((t (:background "misty rose" :foreground "gray40" :underline nil))))
@@ -1909,6 +1749,7 @@
  '(region ((t (:background "light cyan" :inverse-video nil))))
  '(secondary-selection ((t (:extend t :background "LightBlue1"))))
  '(shadow ((t (:foreground "burlywood4"))))
+ '(term-color-yellow ((t (:background "DarkGoldenrod2" :foreground "DarkGoldenrod2"))))
  '(vertico-current ((t (:extend t :background "LightBlue1"))))
  '(vterm-color-white ((t (:background "DarkOrange1" :foreground "DarkOrange1"))))
  '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
