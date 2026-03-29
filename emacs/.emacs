@@ -29,6 +29,16 @@
 
 (straight-use-package 'exec-path-from-shell)
 
+;; Eldoc and project must be first otherwise they could be overridden
+;; with later and non-working versions.
+(use-package eldoc :straight (:type built-in))
+
+(straight-use-package 'project)
+
+(use-package flymake
+  :straight t
+  :after project)
+
 (straight-use-package 'ac-js2)
 (straight-use-package 'ace-window)
 (straight-use-package 'ag)
@@ -74,11 +84,22 @@ If the buffer doesn't exist, display a message."
      (t
       (message "Copilot buffer does not exist")))))
 
+(defun unescape-all-unicode ()
+  "Replace all \\uXXXX sequences in the buffer with their actual Unicode characters."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "\\\\u\\([0-9a-fA-F]\\{4\\}\\)" nil t)
+      (replace-match (string (string-to-number (match-string 1) 16)) t t))))
+
 (add-hook 'org-mode-hook #'visual-line-mode)
 
 (use-package eca
   :straight (eca :type git :host github :repo "editor-code-assistant/eca-emacs" :files ("*.el"))
-  :bind ("C-x c" . 'eca-chat-toggle-window))
+  :bind ("C-x c" . 'eca-chat-toggle-window)
+  ;; :custom
+  ;; (eca-chat-tool-call-prepare-throttle 'all)
+  )
 
 (straight-use-package 'csv-mode)
 
@@ -93,51 +114,56 @@ If the buffer doesn't exist, display a message."
         "-l --almost-all --human-readable --group-directories-first --no-group")
   ;; this command is useful when you want to close the window of `dirvish-side'
   ;; automatically when opening a file
-  (put 'dired-find-alternate-file 'disabled nil))
-
-(use-package dirvish
-  :straight t
-  :ensure t
-  :init
-  (dirvish-override-dired-mode)
-  :custom
-  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
-   '(("h" "~/"            "Home")
-     ("d" "~/Downloads/"  "Downloads")
-     ("t" "~/Desktop"     "Desktop")))
-  :config
-  ;; (dirvish-peek-mode)             ; Preview files in minibuffer
-  ;; (dirvish-side-follow-mode)      ; similar to `treemacs-follow-mode'
-  (setq dirvish-default-layout '(0 0.4 0.6))
-  (setq dirvish-mode-line-format
-        '(:left (sort symlink) :right (omit yank index)))
-  (setq dirvish-attributes           ; The order *MATTERS* for some attributes
-        '(vc-state subtree-state all-the-icons collapse file-time file-size)
-        dirvish-side-attributes
-        '(vc-state all-the-icons collapse file-size))
-  :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
-  (("C-x d" . dirvish)
-   :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
-   (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
+  (put 'dired-find-alternate-file 'disabled nil)
+  :bind
+  (("C-x d" . dired)
+   :map dired-mode-map
    ("§"   . dired-up-directory)
-   ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
-   ("a"   . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
-   ("f"   . dirvish-file-info-menu)    ; [f]ile info
-   ("o"   . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
-   ("s"   . dirvish-quicksort)         ; [s]ort flie list
-   ("r"   . dirvish-history-jump)      ; [r]ecent visited
-   ("l"   . dirvish-ls-switches-menu)  ; [l]s command flags
-   ("v"   . dirvish-vc-menu)           ; [v]ersion control commands
-   ("*"   . dirvish-mark-menu)
-   ("y"   . dirvish-yank-menu)
-   ("N"   . dirvish-narrow)
-   ("^"   . dirvish-history-last)
-   ("TAB" . dirvish-subtree-toggle)
-   ("M-f" . dirvish-history-go-forward)
-   ("M-b" . dirvish-history-go-backward)
-   ("M-e" . dirvish-emerge-menu)))
+   (";"   . dired-down-directory)))
 
-(use-package eldoc :straight (:type built-in))
+;; (use-package dirvish
+;;   :straight t
+;;   :ensure t
+;;   :init
+;;   (dirvish-override-dired-mode)
+;;   :custom
+;;   (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+;;    '(("h" "~/"            "Home")
+;;      ("d" "~/Downloads/"  "Downloads")
+;;      ("t" "~/Desktop"     "Desktop")))
+;;   :config
+;;   ;; (dirvish-peek-mode)             ; Preview files in minibuffer
+;;   ;; (dirvish-side-follow-mode)      ; similar to `treemacs-follow-mode'
+;;   (setq dirvish-default-layout '(0 0.4 0.6))
+;;   (setq dirvish-mode-line-format
+;;         '(:left (sort symlink) :right (omit yank index)))
+;;   (setq dirvish-attributes           ; The order *MATTERS* for some attributes
+;;         '(vc-state subtree-state all-the-icons collapse file-time file-size)
+;;         dirvish-side-attributes
+;;         '(vc-state all-the-icons collapse file-size))
+;;   :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
+;;   (("C-x d" . dirvish)
+;;    :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
+;;    (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
+;;    ("§"   . dired-up-directory)
+;;    ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
+;;    ("a"   . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
+;;    ("f"   . dirvish-file-info-menu)    ; [f]ile info
+;;    ("o"   . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
+;;    ("s"   . dirvish-quicksort)         ; [s]ort flie list
+;;    ("r"   . dirvish-history-jump)      ; [r]ecent visited
+;;    ("l"   . dirvish-ls-switches-menu)  ; [l]s command flags
+;;    ("v"   . dirvish-vc-menu)           ; [v]ersion control commands
+;;    ("*"   . dirvish-mark-menu)
+;;    ("y"   . dirvish-yank-menu)
+;;    ("N"   . dirvish-narrow)
+;;    ("^"   . dirvish-history-last)
+;;    ("TAB" . dirvish-subtree-toggle)
+;;    ("M-f" . dirvish-history-go-forward)
+;;    ("M-b" . dirvish-history-go-backward)
+;;    ("M-e" . dirvish-emerge-menu)))
+
+
 
 (straight-use-package 'deadgrep)
 (straight-use-package 'defproject)
@@ -152,6 +178,13 @@ If the buffer doesn't exist, display a message."
 (straight-use-package 'dumb-jump)
 (straight-use-package 'easy-kill)
 (straight-use-package 'eval-sexp-fu)
+
+(use-package flycheck
+  :straight t
+;;  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
+
 (straight-use-package 'flycheck-clj-kondo)
 ;;(straight-use-package 'flycheck-popup-tip)
 ;;(straight-use-package 'flycheck-pos-tip)
@@ -183,6 +216,10 @@ If the buffer doesn't exist, display a message."
 (straight-use-package 'projectile-ripgrep)
 (straight-use-package 'python-mode)
 (straight-use-package 'rainbow-delimiters)
+
+(use-package magit-delta
+  :straight t
+  :hook (magit-mode . magit-delta-mode))
 
 (use-package restclient
   :straight t
@@ -314,7 +351,7 @@ If the buffer doesn't exist, display a message."
          ("<help> a" . consult-apropos)            ;; orig. apropos-command
          ;; M-g bindings (goto-map)
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g f" . consult-flycheck)               ;; Alternative: consult-flymake
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
@@ -582,10 +619,12 @@ If the buffer doesn't exist, display a message."
     :custom
     (eglot-connect-timeout 300))
 
-  (use-package eglot-booster
-    :straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")
-    :after eglot
-    :config (eglot-booster-mode)))
+  ;; (use-package eglot-booster
+  ;;   :straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")
+  ;;   :after eglot
+  ;;   :config (eglot-booster-mode))
+
+  )
 
 (when use-lsp-mode
   (use-package lsp-mode
@@ -839,7 +878,7 @@ If the buffer doesn't exist, display a message."
 (require 'flycheck-clj-kondo)
 
 ;; (eval-after-load 'flycheck '(flycheck-clojure-setup))
-(add-hook 'after-init-hook #'global-flycheck-mode)
+;; (add-hook 'after-init-hook #'global-flycheck-mode)
 ;; (eval-after-load 'flycheck
 ;;   '(custom-set-variables
 ;;    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
@@ -1004,6 +1043,15 @@ If the buffer doesn't exist, display a message."
 
 (global-set-key (kbd "s-r") 'revert-all-buffers)
 ;;(global-auto-revert-mode t)
+
+(defun magit-add-current-branch-to-kill-ring ()
+  "Show the current branch in the echo-area and add it to the `kill-ring'."
+  (interactive)
+  (let ((branch (magit-get-current-branch)))
+    (if branch
+        (progn (kill-new branch)
+               (message "%s" branch))
+      (user-error "There is not current branch"))))
 
 ;; We'll start the server just in case to avoid
 ;; git complaining about EDITOR.
