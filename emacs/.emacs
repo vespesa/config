@@ -20,10 +20,10 @@
 (setq use-lsp-bridge nil)
 
 (defvar use-eglot)
-(setq use-eglot t)
+(setq use-eglot nil)
 
 (defvar use-lsp-mode)
-(setq use-lsp-mode nil)
+(setq use-lsp-mode t)
 
 (straight-use-package 'use-package)
 
@@ -38,6 +38,11 @@
 (use-package flymake
   :straight t
   :after project)
+
+(use-package flycheck
+  :straight t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (straight-use-package 'ac-js2)
 (straight-use-package 'ace-window)
@@ -178,12 +183,6 @@ If the buffer doesn't exist, display a message."
 (straight-use-package 'dumb-jump)
 (straight-use-package 'easy-kill)
 (straight-use-package 'eval-sexp-fu)
-
-(use-package flycheck
-  :straight t
-;;  :ensure t
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (straight-use-package 'flycheck-clj-kondo)
 ;;(straight-use-package 'flycheck-popup-tip)
@@ -637,12 +636,15 @@ If the buffer doesn't exist, display a message."
    (setq read-process-output-max (* 1024 1024)) ;; 1mb
    (setq lsp-idle-delay 0.500)
    (setq lsp-diagnostics-provider :none)
+   (setq lsp-semgrep-server-command nil)
    :hook ((clojure-mode . lsp)
           (clojurescript-mode . lsp)
           (js2-mode . lsp))
    :commands lsp
    :bind
-   ("M-?" . lsp-find-references)))
+   ("M-?" . lsp-find-references))
+
+  )
 
 (defun lsp-force-faces ()
   (interactive)
@@ -1019,6 +1021,9 @@ If the buffer doesn't exist, display a message."
 
 ;(setq magit-last-seen-setup-instructions "1.4.0")
 (global-set-key (kbd "C-x g") 'magit-status)
+
+;; Show all worktrees at the end of the status buffer (if more than one)
+(add-hook 'magit-status-sections-hook #'magit-insert-worktrees t)
 
 (global-git-gutter-mode t)
 
