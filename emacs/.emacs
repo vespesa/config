@@ -1,5 +1,17 @@
 ;; -*- lexical-binding: t -*-
 
+;; Native compilation currently fails in the local libgccjit/GCC setup with:
+;; "libgccjit.so: error: error invoking gcc driver". Disable async native
+;; compilation to keep the warnings buffer usable; remove this after fixing the
+;; toolchain.
+(when (boundp 'native-comp-deferred-compilation)
+  (setq native-comp-deferred-compilation nil))
+(when (boundp 'native-comp-jit-compilation)
+  (setq native-comp-jit-compilation nil))
+(when (boundp 'comp-deferred-compilation)
+  (setq comp-deferred-compilation nil))
+(setq warning-suppress-types '((native-compiler)))
+
 ;; Bootstrap straight.el
 (setq straight-repository-branch "develop")
 
@@ -20,10 +32,10 @@
 (setq use-lsp-bridge nil)
 
 (defvar use-eglot)
-(setq use-eglot nil)
+(setq use-eglot t)
 
 (defvar use-lsp-mode)
-(setq use-lsp-mode t)
+(setq use-lsp-mode nil)
 
 (straight-use-package 'use-package)
 
@@ -59,7 +71,7 @@
 
 (straight-use-package 'clojure-mode-extra-font-locking)
 (straight-use-package 'color-identifiers-mode)
-(straight-use-package 'color-theme-sanityinc-solarized)
+;;(straight-use-package 'color-theme-sanityinc-solarized)
 ;; (straight-use-package 'company)
 ;; (straight-use-package 'company-quickhelp)
 (straight-use-package 'copy-as-format)
@@ -184,10 +196,44 @@ If the buffer doesn't exist, display a message."
 (straight-use-package 'easy-kill)
 (straight-use-package 'eval-sexp-fu)
 
+(use-package ef-themes
+  :straight t
+  :ensure t
+  :init
+  ;; This makes the Modus commands listed below consider only the Ef
+  ;; themes.  For an alternative that includes Modus and all
+  ;; derivative themes (like Ef), enable the
+  ;; `modus-themes-include-derivatives-mode' instead.  The manual of
+  ;; the Ef themes has a section that explains all the possibilities:
+  ;;
+  ;; - Evaluate `(info "(ef-themes) Working with other Modus themes or taking over Modus")'
+  ;; - Visit <https://protesilaos.com/emacs/ef-themes#h:6585235a-5219-4f78-9dd5-6a64d87d1b6e>
+  ;;(ef-themes-take-over-modus-themes-mode 1)
+  (modus-themes-include-derivatives-mode 1)
+  ;; :bind
+  ;; (("<f5>" . modus-themes-rotate)
+  ;;  ("C-<f5>" . modus-themes-select)
+  ;;  ("M-<f5>" . modus-themes-load-random))
+  :config
+  ;; All customisations here.
+  (setq modus-themes-mixed-fonts t)
+  (setq modus-themes-italic-constructs t)
+
+  ;; Finally, load your theme of choice (or a random one with
+  ;; `modus-themes-load-random', `modus-themes-load-random-dark',
+  ;; `modus-themes-load-random-light').
+  (modus-themes-load-theme 'ef-duo-light))
+
 (straight-use-package 'flycheck-clj-kondo)
 ;;(straight-use-package 'flycheck-popup-tip)
 ;;(straight-use-package 'flycheck-pos-tip)
 (straight-use-package 'ggtags)
+
+(use-package ghostel
+  :straight t
+  :init
+  (global-set-key (kbd "H-3") 'ghostel-project))
+
 (straight-use-package 'git-gutter)
 
 (straight-use-package 'groovy-mode)
@@ -228,7 +274,7 @@ If the buffer doesn't exist, display a message."
 (straight-use-package 'smart-mode-line)
 (straight-use-package 'smartparens)
 (straight-use-package 'smooth-scrolling)
-(straight-use-package 'solarized-theme)
+;;(straight-use-package 'solarized-theme)
 ;;(straight-use-package 'swiper)
 (straight-use-package 'syslog-mode)
 (straight-use-package 'tagedit)
@@ -663,6 +709,7 @@ If the buffer doesn't exist, display a message."
   :demand t
   :hook ((text-mode prog-mode) . glyphless-display-mode)
   :config
+  (setq x-colors (ns-list-colors))
   (set-face-background 'glyphless-char "red"))
 
 (use-package vterm
@@ -1096,7 +1143,7 @@ If the buffer doesn't exist, display a message."
 ;; (global-set-key (kbd "H-p") 'helm-projectile-find-file)
 (global-set-key (kbd "H-1") 'projectile-run-eshell)
 (global-set-key (kbd "H-2") 'projectile-run-shell)
-(global-set-key (kbd "H-3") 'projectile-run-vterm)
+;; (global-set-key (kbd "H-3") 'projectile-run-vterm)
 ;; (global-set-key (kbd "<f13>") 'helm-projectile-find-file)
 ;; (global-set-key (kbd "<f16>") 'helm-projectile-find-file)
 (global-set-key (kbd "C-<kp-7>") 'projectile-run-eshell)
@@ -1178,7 +1225,7 @@ If the buffer doesn't exist, display a message."
 
 ;;; Treat all themes as safe
 (setq custom-safe-themes t)
-(color-theme-sanityinc-solarized-light)
+;;(color-theme-sanityinc-solarized-light)
 ;; Solarized default face bg color: #fdf6e3
 
 (setq sml/no-confirm-load-theme t)
@@ -1417,6 +1464,7 @@ If the buffer doesn't exist, display a message."
  '(clojure-docstring-fill-column 90)
  '(clojure-indent-style 'align-arguments)
  '(coffee-tab-width 2)
+ '(column-number-mode t)
  '(comint-process-echoes t)
  '(comint-prompt-read-only t)
  '(company-backends
@@ -1530,21 +1578,6 @@ If the buffer doesn't exist, display a message."
  '(cua-overwrite-cursor-color "#b58900")
  '(cua-read-only-cursor-color "#859900")
  '(cursor-type 'bar)
- '(custom-enabled-themes '(sanityinc-solarized-light))
- '(custom-safe-themes
-   '("ff9e6deb9cfc908381c1267f407b8830bcad6028231a5f736246b9fc65e92b44"
-     "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f"
-     "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e"
-     "d1dbd38c2fef808a27bb411ecff76a0a8026856a16cb2a1fb8820bedeb45740a"
-     "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0"
-     "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4"
-     "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4"
-     "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879"
-     default))
- '(custom-theme-load-path
-   '("/Users/vespesa/.emacs.d/elpa/color-theme-sanityinc-solarized-2.28/"
-     "/Users/vespesa/.emacs.d/elpa/zenburn-theme-2.2"
-     custom-theme-directory t) t)
  '(dired-dwim-target t)
  '(display-buffer-alist '(("\\*shell" display-buffer-same-window (nil))))
  '(eglot-code-action-indications '(mode-line))
@@ -1576,22 +1609,6 @@ If the buffer doesn't exist, display a message."
  '(helm-split-window-default-side 'same)
  '(helm-swoop-pre-input-function (lambda nil ""))
  '(helm-swoop-split-with-multiple-windows t)
- '(highlight-changes-colors '("#d33682" "#6c71c4"))
- '(highlight-symbol-colors
-   (--map (solarized-color-blend it "#fdf6e3" 0.25)
-          '("#b58900" "#2aa198" "#dc322f" "#6c71c4" "#859900"
-            "#cb4b16" "#268bd2")))
- '(highlight-symbol-foreground-color "#586e75")
- '(highlight-tail-colors
-   '(("#eee8d5" . 0) ("#B4C342" . 20) ("#69CABF" . 30) ("#69B7F0" . 50)
-     ("#DEB542" . 60) ("#F2804F" . 70) ("#F771AC" . 85)
-     ("#eee8d5" . 100)))
- '(hl-bg-colors
-   '("#DEB542" "#F2804F" "#FF6E64" "#F771AC" "#9EA0E5" "#69B7F0"
-     "#69CABF" "#B4C342"))
- '(hl-fg-colors
-   '("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3"
-     "#fdf6e3" "#fdf6e3"))
  '(ibuffer-formats
    '((mark modified read-only locked " " (name 40 40 :left :elide) " "
            (size 9 -1 :right) " " (mode 16 16 :left :elide) " "
@@ -1730,9 +1747,9 @@ If the buffer doesn't exist, display a message."
  '(show-paren-mode nil)
  '(show-smartparens-global-mode t)
  '(smartparens-global-strict-mode t)
- '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#eee8d5" 0.2))
  '(sml/no-confirm-load-theme nil)
  '(solarized-broken-srgb t)
+ '(sp-highlight-pair-overlay nil)
  '(sp-hybrid-kill-excessive-whitespace nil)
  '(sp-ignore-modes-list '(minibuffer-inactive-mode html-mode robot-mode))
  '(sp-navigate-close-if-unbalanced t)
@@ -1762,51 +1779,15 @@ If the buffer doesn't exist, display a message."
                  "#93115C" "#d33682" "#00736F" "#2aa198" "#657b83"
                  "#839496"))
  '(xref-search-program 'ripgrep))
+(put 'erase-buffer 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "nil" :family "Monaco"))))
- '(cider-error-highlight-face ((t (:inherit nil :background "MistyRose1"))))
- '(cider-result-overlay-face ((t (:background "lightgreen" :box (:line-width -1 :color "black")))))
- '(cider-test-failure-face ((t (:background "orange red" :foreground "white"))))
- '(company-preview ((t (:background "khaki1" :foreground "#839496"))))
- '(company-tooltip ((t (:background "wheat2"))))
- '(eca-chat-context-cursor-face ((t (:foreground "LightSalmon3" :underline t :height 0.9))))
- '(eglot-diagnostic-tag-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "black"))))
- '(eshell-prompt ((t (:foreground "dark green" :weight normal))))
- '(flycheck-error ((t (:background "misty rose" :foreground "gray40" :underline nil))))
- '(flycheck-warning ((t (:background "LightGoldenrod1" :foreground "black" :underline nil))))
- '(fringe ((t (:background "#fdf6e3"))))
- '(git-gutter:added ((t (:foreground "light green" :weight bold))))
- '(git-gutter:modified ((t (:foreground "SkyBlue1" :weight bold))))
- '(helm-selection ((t (:background "sienna1" :foreground "White"))))
- '(hl-line ((t (:background "tan1"))))
- '(ivy-current-match ((t (:background "sienna1" :foreground "white"))))
- '(ivy-minibuffer-match-face-1 ((t nil)))
- '(ivy-minibuffer-match-face-2 ((t (:background "chocolate1" :foreground "white"))))
- '(ivy-minibuffer-match-face-3 ((t (:background "tan2" :foreground "white"))))
- '(ivy-minibuffer-match-face-4 ((t (:background "LightSalmon1" :foreground "white"))))
- '(ivy-modified-buffer ((t (:foreground "firebrick"))))
- '(ivy-virtual ((t nil)))
- '(lazy-highlight ((t (:background "paleturquoise2"))))
- '(lsp-bridge-ref-font-lock-function-location ((t (:foreground "green4" :weight bold))))
- '(lsp-bridge-ref-font-lock-header-line-edit-mode ((t (:foreground "dark blue" :weight bold))))
- '(lsp-bridge-ref-font-lock-header-line-text ((t (:foreground "SpringGreen4" :weight bold))))
- '(lsp-bridge-ref-font-lock-match ((t (:foreground "firebrick3" :weight bold))))
- '(lsp-flycheck-info-unnecessary-face ((t (:foreground "dim gray" :underline (:color "#2aa198" :style wave :position nil)))) t)
- '(lsp-flycheck-warning-unnecessary-face ((t (:background "LightGoldenrod1" :foreground "dark slate gray" :underline nil))) t)
- '(mode-line ((t (:background "papaya whip" :foreground "black" :box (:line-width 1 :color "#657b83") :weight normal))))
- '(rainbow-delimiters-unmatched-face ((t (:background "dark red" :foreground "white"))))
- '(region ((t (:background "light cyan" :inverse-video nil))))
- '(secondary-selection ((t (:extend t :background "LightBlue1"))))
- '(shadow ((t (:foreground "burlywood4"))))
- '(term-color-yellow ((t (:background "DarkGoldenrod2" :foreground "DarkGoldenrod2"))))
- '(vertico-current ((t (:extend t :background "LightBlue1"))))
- '(vterm-color-white ((t (:background "DarkOrange1" :foreground "DarkOrange1"))))
- '(web-mode-comment-face ((t (:foreground "dark blue" :slant normal))))
- '(web-mode-current-column-highlight-face ((t (:background "bisque")))))
-(put 'erase-buffer 'disabled nil)
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+ '(default ((t (:family "Monaco" :foundry "nil" :slant normal :weight regular :height 110 :width normal))))
+ '(git-gutter:added ((t (:background "#6cc06c" :foreground "#6cc06c" :height 0.4))))
+ '(git-gutter:deleted ((t (:background "#d84a4f" :foreground "#d84a4f" :height 0.4))))
+ '(git-gutter:modified ((t (:background "SlateGray3" :foreground "SlateGray3" :height 0.4)))))
